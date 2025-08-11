@@ -1,7 +1,7 @@
 <div align="center">
   <img src="logo.svg" alt="Kansofy-Trade Logo" width="200" />
   
-  # Kansofy-Trade
+  # TradeMCP
   
   **Open-source MCP server for document workflow simplification.**
 </div>
