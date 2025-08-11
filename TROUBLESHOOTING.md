@@ -131,9 +131,9 @@ python -m json.tool ~/Library/Application\ Support/Claude/claude_desktop_config.
 ```json
 {
   "mcpServers": {
-    "kansofy-trade": {
+    "trademcp": {
       "command": "python",
-      "args": ["/absolute/path/to/kansofy-trade/mcp_server.py"]
+      "args": ["/absolute/path/to/trademcp/mcp_server.py"]
     }
   }
 }
@@ -142,9 +142,9 @@ python -m json.tool ~/Library/Application\ Support/Claude/claude_desktop_config.
 
 3. **Test MCP server directly:**
 ```bash
-cd /path/to/kansofy-trade
+cd /path/to/trademcp
 python mcp_server.py
-# Should see: "Starting Kansofy-Trade MCP Server..."
+# Should see: "Starting TradeMCP MCP Server..."
 ```
 
 4. **Check MCP client logs:**
@@ -171,7 +171,7 @@ ps aux | grep [client-name]
 
 **Symptoms:**
 ```
-Failed to start MCP server: kansofy-trade
+Failed to start MCP server: trademcp
 ```
 
 **Solutions:**
@@ -180,9 +180,9 @@ Failed to start MCP server: kansofy-trade
 ```json
 {
   "mcpServers": {
-    "kansofy-trade": {
-      "command": "/Users/yourname/kansofy-trade/venv/bin/python",
-      "args": ["/Users/yourname/kansofy-trade/mcp_server.py"]
+    "trademcp": {
+      "command": "/Users/yourname/trademcp/venv/bin/python",
+      "args": ["/Users/yourname/trademcp/mcp_server.py"]
     }
   }
 }
@@ -192,12 +192,12 @@ Failed to start MCP server: kansofy-trade
 ```json
 {
   "mcpServers": {
-    "kansofy-trade": {
+    "trademcp": {
       "command": "python",
       "args": ["/path/to/mcp_server.py"],
       "env": {
-        "PYTHONPATH": "/path/to/kansofy-trade",
-        "DATABASE_PATH": "/path/to/kansofy-trade/kansofy_trade.db"
+        "PYTHONPATH": "/path/to/trademcp",
+        "DATABASE_PATH": "/path/to/trademcp/kansofy_trade.db"
       }
     }
   }
@@ -680,7 +680,7 @@ def process_large_document(file_path):
 
 ### General Questions
 
-**Q: How many documents can Kansofy-Trade handle?**
+**Q: How many documents can TradeMCP handle?**
 A: The system is tested with up to 100,000 documents. Performance depends on document size and complexity. For larger collections, consider PostgreSQL migration.
 
 **Q: Can I use this without Claude Desktop?**
@@ -721,7 +721,7 @@ A: Yes, use the REST API endpoints. See the [API documentation](MCP_TOOLS_REFERE
 A: The MCP tools can be called directly from Python. See [Usage Guide](USAGE_GUIDE.md) for examples.
 
 **Q: Can multiple users access the system?**
-A: Currently single-user focused. Multi-user support with authentication is on the roadmap.
+A: Currently single-user focused. For multi-user support, consider PostgreSQL deployment with authentication middleware.
 
 **Q: How do I deploy to production?**
 A: See the Docker deployment section in [Installation Guide](INSTALLATION.md). Use PostgreSQL for production deployments.
@@ -808,7 +808,7 @@ When reporting issues, include:
 ## Environment
 - OS: [e.g., macOS 14.1]
 - Python version: [e.g., 3.9.7]
-- Kansofy-Trade version: [e.g., 1.0.0]
+- TradeMCP version: [e.g., 1.0.0]
 - Claude Desktop version: [if applicable]
 
 ## Issue Description
@@ -839,8 +839,8 @@ When reporting issues, include:
 
 ### Support Channels
 
-- **GitHub Issues**: [github.com/kansofy/kansofy-trade/issues](https://github.com/kansofy/kansofy-trade/issues)
-- **Discussions**: [github.com/kansofy/kansofy-trade/discussions](https://github.com/kansofy/kansofy-trade/discussions)
+- **GitHub Issues**: [github.com/kansofy/trademcp/issues](https://github.com/kansofy/trademcp/issues)
+- **Discussions**: [github.com/kansofy/trademcp/discussions](https://github.com/kansofy/trademcp/discussions)
 - **Documentation**: [Full documentation](README.md)
 
 ### Quick Support Checklist
@@ -858,4 +858,4 @@ When reporting issues, include:
 
 ---
 
-*Still stuck? [Open an issue](https://github.com/kansofy/kansofy-trade/issues/new) with details from the diagnostic script.*
+*Still stuck? [Open an issue](https://github.com/kansofy/trademcp/issues/new) with details from the diagnostic script.*

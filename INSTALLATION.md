@@ -68,8 +68,8 @@ For experienced users who want to get started immediately:
 
 ```bash
 # 1. Clone repository
-git clone https://github.com/kansofy/kansofy-trade.git
-cd kansofy-trade
+git clone https://github.com/kansofy/trademcp.git
+cd trademcp
 
 # 2. Create virtual environment (recommended)
 python -m venv venv
@@ -93,13 +93,13 @@ python test_mcp_direct.py
 
 ```bash
 # Using HTTPS (recommended)
-git clone https://github.com/kansofy/kansofy-trade.git
+git clone https://github.com/kansofy/trademcp.git
 
 # Or using SSH (if you have SSH keys set up)
-git clone git@github.com:kansofy/kansofy-trade.git
+git clone git@github.com:kansofy/trademcp.git
 
 # Navigate to the project directory
-cd kansofy-trade
+cd trademcp
 ```
 
 ### Step 2: Set Up Python Environment
@@ -122,10 +122,10 @@ venv\Scripts\activate
 **Option B: Conda Environment**
 ```bash
 # Create conda environment
-conda create -n kansofy-trade python=3.9
+conda create -n trademcp python=3.9
 
 # Activate environment
-conda activate kansofy-trade
+conda activate trademcp
 ```
 
 ### Step 3: Install Python Dependencies
@@ -211,15 +211,15 @@ mkdir -p ~/Library/Application\ Support/Claude
 nano ~/Library/Application\ Support/Claude/claude_desktop_config.json
 ```
 
-3. **Add Kansofy-Trade Server**:
+3. **Add TradeMCP Server**:
 ```json
 {
   "mcpServers": {
-    "kansofy-trade": {
+    "trademcp": {
       "command": "python",
-      "args": ["/absolute/path/to/kansofy-trade/mcp_server.py"],
+      "args": ["/absolute/path/to/trademcp/mcp_server.py"],
       "env": {
-        "DATABASE_PATH": "/absolute/path/to/kansofy-trade/kansofy_trade.db"
+        "DATABASE_PATH": "/absolute/path/to/trademcp/kansofy_trade.db"
       }
     }
   }
@@ -229,7 +229,7 @@ nano ~/Library/Application\ Support/Claude/claude_desktop_config.json
 **Important**: Replace `/absolute/path/to` with your actual path:
 ```bash
 # Get the absolute path
-pwd  # Run this in the kansofy-trade directory
+pwd  # Run this in the trademcp directory
 ```
 
 #### Windows Configuration
@@ -248,11 +248,11 @@ notepad %APPDATA%\Claude\claude_desktop_config.json
 ```json
 {
   "mcpServers": {
-    "kansofy-trade": {
+    "trademcp": {
       "command": "python",
-      "args": ["C:/path/to/kansofy-trade/mcp_server.py"],
+      "args": ["C:/path/to/trademcp/mcp_server.py"],
       "env": {
-        "DATABASE_PATH": "C:/path/to/kansofy-trade/kansofy_trade.db"
+        "DATABASE_PATH": "C:/path/to/trademcp/kansofy_trade.db"
       }
     }
   }
@@ -307,7 +307,7 @@ python -m uvicorn app.main:app --reload --port 8000
 // Configure in Copilot Studio as external tool
 {
   "tool": {
-    "name": "kansofy-trade",
+    "name": "trademcp",
     "type": "mcp",
     "endpoint": "http://localhost:5000",
     "description": "Document workflow engine"
@@ -334,7 +334,7 @@ python mcp_server.py
 What MCP tools do you have available?
 ```
 
-Your AI should list the 14 Kansofy-Trade engine operations.
+Your AI should list the 14 TradeMCP engine operations.
 
 3. **Test an Operation**:
 ```
@@ -369,7 +369,7 @@ python -m json.tool ~/Library/Application\ Support/Claude/claude_desktop_config.
 "args": ["./mcp_server.py"]  # Relative path
 
 # This WILL work
-"args": ["/Users/yourname/kansofy-trade/mcp_server.py"]  # Absolute path
+"args": ["/Users/yourname/trademcp/mcp_server.py"]  # Absolute path
 ```
 
 **Check Python path**:
@@ -378,7 +378,7 @@ python -m json.tool ~/Library/Application\ Support/Claude/claude_desktop_config.
 which python
 
 # Update config to use full path
-"command": "/Users/yourname/kansofy-trade/venv/bin/python"
+"command": "/Users/yourname/trademcp/venv/bin/python"
 ```
 
 #### 3. Database Errors
@@ -435,13 +435,13 @@ For isolated, reproducible installations:
 
 ```bash
 # Build Docker image
-docker build -t kansofy-trade .
+docker build -t trademcp .
 
 # Run container
-docker run -p 8000:8000 -v $(pwd)/uploads:/app/uploads kansofy-trade
+docker run -p 8000:8000 -v $(pwd)/uploads:/app/uploads trademcp
 
 # For MCP with Docker
-docker run -it kansofy-trade python mcp_server.py
+docker run -it trademcp python mcp_server.py
 ```
 
 **Docker Compose** (recommended for production):
@@ -496,10 +496,10 @@ MAX_UPLOAD_SIZE=52428800          # 50MB
 
 ## Getting Help
 
-- **Issues**: [GitHub Issues](https://github.com/kansofy/kansofy-trade/issues)
+- **Issues**: [GitHub Issues](https://github.com/kansofy/trademcp/issues)
 - **Documentation**: [Full Documentation](README.md)
-- **Community**: [Discussions](https://github.com/kansofy/kansofy-trade/discussions)
+- **Community**: [Discussions](https://github.com/kansofy/trademcp/discussions)
 
 ---
 
-*Installation trouble? [Check our FAQ](TROUBLESHOOTING.md) or [open an issue](https://github.com/kansofy/kansofy-trade/issues/new)*
+*Installation trouble? [Check our FAQ](TROUBLESHOOTING.md) or [open an issue](https://github.com/kansofy/trademcp/issues/new)*

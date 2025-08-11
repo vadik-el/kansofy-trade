@@ -2,7 +2,7 @@
 
 **One engine, any AI platform. MCP makes it vendor-agnostic.**
 
-This guide shows how to connect Kansofy-Trade with different AI platforms and MCP clients.
+This guide shows how to connect TradeMCP with different AI platforms and MCP clients.
 
 ## Table of Contents
 - [Platform Matrix](#platform-matrix)
@@ -57,11 +57,11 @@ nano ~/Library/Application\ Support/Claude/claude_desktop_config.json
 ```json
 {
   "mcpServers": {
-    "kansofy-trade": {
+    "trademcp": {
       "command": "python",
-      "args": ["/absolute/path/to/kansofy-trade/mcp_server.py"],
+      "args": ["/absolute/path/to/trademcp/mcp_server.py"],
       "env": {
-        "DATABASE_PATH": "/absolute/path/to/kansofy-trade/kansofy_trade.db"
+        "DATABASE_PATH": "/absolute/path/to/trademcp/kansofy_trade.db"
       }
     }
   }
@@ -77,11 +77,11 @@ nano ~/Library/Application\ Support/Claude/claude_desktop_config.json
 ```json
 {
   "mcpServers": {
-    "kansofy-trade": {
+    "trademcp": {
       "command": "python",
-      "args": ["C:/path/to/kansofy-trade/mcp_server.py"],
+      "args": ["C:/path/to/trademcp/mcp_server.py"],
       "env": {
-        "DATABASE_PATH": "C:/path/to/kansofy-trade/kansofy_trade.db"
+        "DATABASE_PATH": "C:/path/to/trademcp/kansofy_trade.db"
       }
     }
   }
@@ -99,7 +99,7 @@ nano ~/Library/Application\ Support/Claude/claude_desktop_config.json
 # In Claude Desktop, ask:
 "What MCP tools do you have available?"
 
-# Should list all 14 Kansofy-Trade tools
+# Should list all 14 TradeMCP tools
 
 # Test with:
 "Can you check the health of the document engine?"
@@ -163,8 +163,8 @@ Actions:
 ```yaml
 # In your Copilot configuration
 Custom Actions:
-  - kansofy-trade.upload_document
-  - kansofy-trade.search_documents
+  - trademcp.upload_document
+  - trademcp.search_documents
   # ... all 14 tools
 ```
 
@@ -178,7 +178,7 @@ mcp-to-rest-bridge --mcp-server python mcp_server.py --port 8000
 ### Testing Copilot Integration
 ```
 # In Copilot, ask:
-"Use kansofy-trade to search for invoices"
+"Use trademcp to search for invoices"
 
 # Should trigger the search_documents action
 ```
@@ -202,7 +202,7 @@ OpenAI GPTs don't natively support MCP, but can connect via **REST API** or **MC
 # Configure as custom action in GPT
 {
   "openapi": "3.0.0",
-  "info": {"title": "Kansofy-Trade", "version": "1.0.0"},
+  "info": {"title": "TradeMCP", "version": "1.0.0"},
   "servers": [{"url": "http://localhost:8000"}],
   "paths": {
     "/search": {
@@ -274,7 +274,7 @@ Google is evaluating MCP support - watch their announcements.
 ## Open Source LLMs
 
 ### Overview
-Any LLM with MCP client capability can use Kansofy-Trade.
+Any LLM with MCP client capability can use TradeMCP.
 
 ### Popular Options
 
@@ -282,7 +282,7 @@ Any LLM with MCP client capability can use Kansofy-Trade.
 ```bash
 # Install LM Studio
 # Add MCP client plugin
-# Configure Kansofy-Trade server
+# Configure TradeMCP server
 ```
 
 #### 2. Ollama + Continue.dev
@@ -291,7 +291,7 @@ Any LLM with MCP client capability can use Kansofy-Trade.
 ollama run llama3.1
 
 # Configure Continue.dev with MCP
-# Point to Kansofy-Trade server
+# Point to TradeMCP server
 ```
 
 #### 3. LocalAI + MCP Bridge
@@ -325,7 +325,7 @@ from mcp import Client
 import asyncio
 
 async def main():
-    # Connect to Kansofy-Trade server
+    # Connect to TradeMCP server
     client = Client()
     await client.connect("python mcp_server.py")
     
@@ -401,7 +401,7 @@ python mcp_server.py  # Keep this running
 ```bash
 # 1. Install Ollama/LM Studio
 # 2. Add MCP client capability  
-# 3. Point to same Kansofy-Trade server
+# 3. Point to same TradeMCP server
 # 4. Same functionality, different LLM
 ```
 
@@ -523,7 +523,7 @@ git add claude_desktop_config.json
 git add copilot_studio_config.yaml
 
 # Use environment variables for paths
-export KANSOFY_PATH=/path/to/kansofy-trade
+export KANSOFY_PATH=/path/to/trademcp
 ```
 
 ### Performance Optimization
@@ -558,4 +558,4 @@ Start with **Claude Desktop** (easiest setup), then explore other platforms as y
 
 ---
 
-*Need help with a specific platform? [Open an issue](https://github.com/kansofy/kansofy-trade/issues) with your setup details.*
+*Need help with a specific platform? [Open an issue](https://github.com/kansofy/trademcp/issues) with your setup details.*

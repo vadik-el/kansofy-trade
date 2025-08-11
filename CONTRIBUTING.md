@@ -2,7 +2,7 @@
 
 **Building the deterministic infrastructure for document workflows. No AI required.**
 
-Thank you for contributing to Kansofy-Trade! This is the **engine** layer - deterministic document operations that work the same every time.
+Thank you for contributing to TradeMCP! This is the **engine** layer - deterministic document operations that work the same every time.
 
 ## Table of Contents
 - [Engine vs Brain: Contribution Boundaries](#engine-vs-brain-contribution-boundaries)
@@ -156,11 +156,11 @@ Look for issues tagged with:
 
 ```bash
 # Fork the repository on GitHub, then:
-git clone https://github.com/YOUR_USERNAME/kansofy-trade.git
-cd kansofy-trade
+git clone https://github.com/YOUR_USERNAME/trademcp.git
+cd trademcp
 
 # Add upstream remote
-git remote add upstream https://github.com/kansofy/kansofy-trade.git
+git remote add upstream https://github.com/kansofy/trademcp.git
 ```
 
 ### 2. Create Development Environment
@@ -726,8 +726,8 @@ def process_document(
 ### Getting Help
 
 - **Discord**: [Join our Discord](https://discord.gg/kansofy)
-- **Discussions**: [GitHub Discussions](https://github.com/kansofy/kansofy-trade/discussions)
-- **Issues**: [GitHub Issues](https://github.com/kansofy/kansofy-trade/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/kansofy/trademcp/discussions)
+- **Issues**: [GitHub Issues](https://github.com/kansofy/trademcp/issues)
 
 ### Recognition
 
@@ -769,10 +769,10 @@ We use [Semantic Versioning](https://semver.org/):
 
 ## Thank You! 🙏
 
-Your contributions make Kansofy-Trade better for everyone. We appreciate your time and effort!
+Your contributions make TradeMCP better for everyone. We appreciate your time and effort!
 
 **Happy Contributing!** 🚀
 
 ---
 
-*Questions? Reach out in [Discussions](https://github.com/kansofy/kansofy-trade/discussions) or [Discord](https://discord.gg/kansofy)*
+*Questions? Reach out in [Discussions](https://github.com/kansofy/trademcp/discussions) or [Discord](https://discord.gg/kansofy)*

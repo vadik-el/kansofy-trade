@@ -876,7 +876,7 @@ reindex_fts5()  # Rebuilds search index
 
 ## Summary
 
-The Kansofy-Trade engine provides deterministic document operations:
+The TradeMCP engine provides deterministic document operations:
 
 1. **Docling Extraction**: IBM's rule-based parser (no AI)
 2. **Deterministic Processing**: Same input = same output always
@@ -888,4 +888,4 @@ Start with basic workflows and gradually explore advanced features as your needs
 
 ---
 
-*Need help? See [Troubleshooting](TROUBLESHOOTING.md) or [open an issue](https://github.com/kansofy/kansofy-trade/issues)*
+*Need help? See [Troubleshooting](TROUBLESHOOTING.md) or [open an issue](https://github.com/kansofy/trademcp/issues)*

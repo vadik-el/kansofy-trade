@@ -1,7 +1,9 @@
 <div align="center">
-  <img src="logo.svg" alt="Kansofy-Trade Logo" width="200" />
+  <img src="logo.svg" alt="TradeMCP Logo" width="200" />
   
   # TradeMCP
+  
+  **Make trade documents machine readable.**
   
   **Open-source MCP server for document workflow simplification.**
 </div>
@@ -14,7 +16,8 @@
 
 This MCP server runs 100% locally using Docling for document extraction - no AI required for the actual processing. Connect it to any MCP-compatible AI assistant:
 - **Claude Desktop** by Anthropic
-- **Microsoft Copilot** via Copilot Studio  
+- **Microsoft Copilot** via Copilot Studio
+- **ChatGPT** with MCP support
 - **Any MCP-compatible client** (growing ecosystem)
 
 ## 🔌 Vendor & Model Agnostic
@@ -28,11 +31,11 @@ The Model Context Protocol (MCP) is an open standard. This means:
 - ✅ Future-proof as more platforms adopt MCP
 - ✅ Use with GPT, Gemini, Llama, or any model
 
-Your document infrastructure shouldn't depend on a single AI vendor. Kansofy-Trade ensures it doesn't.
+Your document infrastructure shouldn't depend on a single AI vendor. TradeMCP ensures it doesn't.
 
 ## 🏗️ The Engine, Not the Brain
 
-Kansofy-Trade is the **engine** that enables document operations:
+TradeMCP is the **engine** that enables document operations:
 - **Powered by Docling**: IBM Research's document parser (no AI needed)
 - **Deterministic Processing**: Same document = same output every time
 - **MCP Native**: Works with any MCP-compatible client
@@ -41,20 +44,24 @@ Kansofy-Trade is the **engine** that enables document operations:
 
 The **brain** (workflow intelligence, trade expertise, compliance logic) can come from any AI model or commercial solution - but the engine runs without any AI.
 
-## 📚 Built on Open Standards
+## 🏗️ Modular Architecture
 
-### Docling by IBM Research
+**All components are modular and replaceable.** Docling can be replaced with domain-specific tools or services tailored to your exact document processing needs.
+
+### Docling by IBM Research (Default Parser)
 This project leverages [Docling](https://github.com/DS4SD/docling), IBM's advanced document conversion technology:
 - **Rule-based extraction** - No AI/ML required
 - Extracts text, tables, and structure from PDFs, DOCX, XLSX, PPTX, and more
 - Maintains document layout and formatting intelligence  
 - Handles complex multi-column layouts and embedded tables
 - Open-source (MIT licensed) and actively maintained
+- **Easily replaceable** with custom parsers for specific document types
 
 ### Model Context Protocol (MCP)
 Open standard for AI-tool communication:
 - Works with Claude Desktop (Anthropic)
 - Compatible with Copilot Studio (Microsoft)
+- Supports ChatGPT with MCP integration
 - Supports any MCP client implementation
 - Vendor-neutral protocol specification
 
@@ -81,9 +88,9 @@ Open standard for AI-tool communication:
 # Add to ~/Library/Application Support/Claude/claude_desktop_config.json
 {
   "mcpServers": {
-    "kansofy-trade": {
+    "trademcp": {
       "command": "python",
-      "args": ["/path/to/kansofy-trade/mcp_server.py"]
+      "args": ["/path/to/trademcp/mcp_server.py"]
     }
   }
 }
@@ -94,6 +101,13 @@ Open standard for AI-tool communication:
 # Configure in Copilot Studio as external tool
 # Point to the MCP server endpoint
 # Use the standard MCP protocol
+```
+
+### With ChatGPT (MCP Support)
+```bash
+# Connect via MCP-compatible ChatGPT clients
+# Point to the same MCP server endpoint
+# Standard MCP protocol compatibility
 ```
 
 ### With Any MCP Client
@@ -186,6 +200,7 @@ No AI inference at search time
 |----------|--------|---------------|
 | Claude Desktop | ✅ Tested | Native support |
 | Microsoft Copilot | ✅ Compatible | Via Copilot Studio |
+| ChatGPT | ✅ Compatible | MCP integration |
 | OpenAI GPTs | 🔄 Planned | MCP bridge needed |
 | Google Gemini | 🔄 Planned | MCP adapter |
 | Open Source LLMs | ✅ Ready | Any MCP client |
@@ -208,7 +223,7 @@ No AI inference at search time
 
 ## 📈 When You Need More
 
-You'll know it's time for commercial when:
+You'll know it's time for commercial solutions when:
 - [ ] Processing >100 documents daily
 - [ ] Need trade-specific workflows
 - [ ] Require compliance validation
@@ -244,4 +259,4 @@ You'll know it's time for commercial when:
 ---
 
 Built with ❤️ for the humans running global trade.  
-The engine for document workflows. The foundation for agentic AI in trade.
+Making trade documents machine readable. The foundation for intelligent trade workflows.

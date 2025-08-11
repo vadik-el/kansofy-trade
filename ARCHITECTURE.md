@@ -34,7 +34,7 @@
                     MCP Protocol (Open Standard)
                             ↕
 ┌─────────────────────────────────────────────────────────┐
-│                  THE ENGINE (Kansofy-Trade)              │
+│                  THE ENGINE (TradeMCP)              │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  │
 │  │   Docling    │  │  SQLite FTS5 │  │ Pre-computed │  │
 │  │  Extraction  │  │    Search    │  │   Vectors    │  │
@@ -389,7 +389,7 @@ CREATE INDEX idx_embeddings_document ON document_embeddings(document_id);
 ### Dependencies Tree
 
 ```
-kansofy-trade/
+trademcp/
 ├── Core Stack
 │   ├── Python 3.9+
 │   ├── FastAPI
@@ -657,7 +657,7 @@ Scaling Strategy:
 
 ```bash
 # Directory Structure
-kansofy-trade/
+trademcp/
 ├── mcp_server.py          # MCP server entry point
 ├── app/
 │   ├── main.py           # FastAPI application
@@ -822,7 +822,7 @@ graph LR
 
 ## Summary
 
-The Kansofy-Trade engine architecture prioritizes:
+The TradeMCP engine architecture prioritizes:
 
 1. **Determinism**: Same input → same output, always
 2. **No AI Dependencies**: Runs without any ML models or inference
