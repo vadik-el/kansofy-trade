@@ -1,8 +1,11 @@
-# Installation Guide 📦
+# Zero-Dependency Installation 📦
 
-Complete setup guide for Kansofy-Trade MCP Server with Claude Desktop integration.
+**No AI required. No API keys. No cloud services. Just install and run.**
+
+This engine runs 100% locally with zero external dependencies.
 
 ## Table of Contents
+- [What You DON'T Need](#what-you-dont-need)
 - [System Requirements](#system-requirements)
 - [Quick Install (5 minutes)](#quick-install-5-minutes)
 - [Detailed Installation](#detailed-installation)
@@ -11,6 +14,22 @@ Complete setup guide for Kansofy-Trade MCP Server with Claude Desktop integratio
 - [Troubleshooting](#troubleshooting)
 - [Docker Installation](#docker-installation)
 - [Development Setup](#development-setup)
+
+## What You DON'T Need
+
+❌ **No AI Dependencies:**
+- No OpenAI API keys
+- No Anthropic API keys
+- No cloud AI services
+- No GPU required
+- No CUDA/ML frameworks
+- No model training
+- No inference servers
+
+✅ **What You DO Need:**
+- Python 3.9+ (standard installation)
+- 4GB RAM (for document processing)
+- Any MCP-compatible client (Claude Desktop, Copilot Studio, etc.)
 
 ## System Requirements
 
@@ -24,7 +43,7 @@ Complete setup guide for Kansofy-Trade MCP Server with Claude Desktop integratio
 - Python 3.9+
 - pip (Python package manager)
 - Git
-- Claude Desktop (for MCP integration)
+- Any MCP client (Claude Desktop, Microsoft Copilot, or others)
 
 ### Checking Your System
 ```bash
@@ -59,10 +78,10 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 # 3. Install dependencies
 pip install -r requirements.txt
 
-# 4. Initialize database
+# 4. Initialize database (SQLite, no external DB needed)
 python -c "from app.core.database import init_database; import asyncio; asyncio.run(init_database())"
 
-# 5. Configure Claude Desktop (see below)
+# 5. Configure your MCP client (Claude, Copilot, etc.)
 
 # 6. Test installation
 python test_mcp_direct.py
@@ -118,11 +137,11 @@ pip install --upgrade pip
 # Install all dependencies
 pip install -r requirements.txt
 
-# Verify key packages installed
-python -c "import mcp.server; print('✅ MCP installed')"
-python -c "import docling; print('✅ Docling installed')"
-python -c "import fastapi; print('✅ FastAPI installed')"
-python -c "import sentence_transformers; print('✅ Sentence Transformers installed')"
+# Verify key packages installed (all deterministic, no AI)
+python -c "import mcp.server; print('✅ MCP Protocol installed')"
+python -c "import docling; print('✅ Docling (rule-based parser) installed')"
+python -c "import fastapi; print('✅ FastAPI (web framework) installed')"
+python -c "import sentence_transformers; print('✅ Embeddings (one-time computation) installed')"
 ```
 
 **Troubleshooting Package Installation:**
@@ -157,22 +176,25 @@ EOF
 ls -la kansofy_trade.db  # Should see the database file
 ```
 
-### Step 5: Download Model Files (First Run)
+### Step 5: Pre-compute Embeddings Model (One-Time)
 
-The sentence transformer model will be downloaded automatically on first use. To pre-download:
+**Note**: This downloads a small model for one-time vector computation. No AI inference happens at search time - vectors are pre-computed and stored.
 
 ```bash
 python << EOF
 from sentence_transformers import SentenceTransformer
-print("Downloading model... this may take a minute")
+print("Downloading embedding model for one-time vector computation...")
+print("This is NOT for AI inference - just pre-computing document vectors")
 model = SentenceTransformer('all-MiniLM-L6-v2')
-print("✅ Model downloaded successfully")
+print("✅ Embedding model ready (vectors are pre-computed, no AI at search time)")
 EOF
 ```
 
-## Claude Desktop Configuration
+## MCP Client Configuration
 
-### macOS Configuration
+### Option A: Claude Desktop (Anthropic)
+
+#### macOS Configuration
 
 1. **Locate Claude Desktop Config**:
 ```bash
@@ -210,7 +232,7 @@ nano ~/Library/Application\ Support/Claude/claude_desktop_config.json
 pwd  # Run this in the kansofy-trade directory
 ```
 
-### Windows Configuration
+#### Windows Configuration
 
 1. **Locate Config File**:
 ```
@@ -237,7 +259,7 @@ notepad %APPDATA%\Claude\claude_desktop_config.json
 }
 ```
 
-### Linux Configuration
+#### Linux Configuration
 
 1. **Locate Config**:
 ```bash
@@ -261,9 +283,9 @@ nano ~/.config/Claude/claude_desktop_config.json
 python test_mcp_direct.py
 
 # Expected output:
-# ✅ MCP Server started successfully
-# ✅ Tools listed: 14 tools available
-# ✅ Search test passed
+# ✅ Engine started successfully (no AI required)
+# ✅ Operations available: 14 deterministic operations
+# ✅ SQL search test passed (no AI)
 # ✅ Health check passed
 ```
 
@@ -279,20 +301,44 @@ python -m uvicorn app.main:app --reload --port 8000
 # You should see the upload interface
 ```
 
-### Step 3: Test Claude Desktop Integration
+### Option B: Microsoft Copilot Studio
 
-1. **Restart Claude Desktop** completely (Quit and reopen)
+```json
+// Configure in Copilot Studio as external tool
+{
+  "tool": {
+    "name": "kansofy-trade",
+    "type": "mcp",
+    "endpoint": "http://localhost:5000",
+    "description": "Document workflow engine"
+  }
+}
+```
 
-2. **Check MCP Connection** in Claude:
+### Option C: Any MCP-Compatible Client
+
+```bash
+# Start the MCP server
+python mcp_server.py
+
+# Server listens on default MCP port
+# Configure your client to connect to this endpoint
+```
+
+### Step 3: Test MCP Client Integration
+
+1. **Restart your MCP client** completely (Quit and reopen)
+
+2. **Check MCP Connection** in your AI assistant:
 ```
 What MCP tools do you have available?
 ```
 
-Claude should list the 14 Kansofy-Trade tools.
+Your AI should list the 14 Kansofy-Trade engine operations.
 
-3. **Test a Tool**:
+3. **Test an Operation**:
 ```
-Can you check the health of the Kansofy-Trade system?
+Can you check the health of the document engine?
 ```
 
 ## Troubleshooting
@@ -309,7 +355,7 @@ which python  # Should show venv path
 pip install -r requirements.txt --force-reinstall
 ```
 
-#### 2. Claude Desktop Not Finding MCP Server
+#### 2. MCP Client Not Finding Engine
 
 **Check config syntax**:
 ```bash
@@ -377,8 +423,10 @@ python -c "import sqlite3; conn = sqlite3.connect('kansofy_trade.db'); print('�
 # Test MCP server can start
 python mcp_server.py --help
 
-# Check Claude Desktop logs (macOS)
+# Check MCP client logs
+# Claude Desktop (macOS):
 tail -f ~/Library/Logs/Claude/mcp.log
+# Other clients: check respective log locations
 ```
 
 ## Docker Installation
@@ -430,10 +478,11 @@ Create `.env` file for development:
 ```bash
 # .env
 DEBUG=true
-DATABASE_PATH=./kansofy_trade.db
-UPLOAD_DIR=./uploads
+DATABASE_PATH=./kansofy_trade.db  # Local SQLite, no external DB
+UPLOAD_DIR=./uploads              # Local storage, no cloud
 LOG_LEVEL=DEBUG
-MAX_UPLOAD_SIZE=10485760  # 10MB
+MAX_UPLOAD_SIZE=52428800          # 50MB
+# Note: No API keys needed!
 ```
 
 ## Next Steps
@@ -443,7 +492,7 @@ MAX_UPLOAD_SIZE=10485760  # 10MB
 1. **Read the [Usage Guide](USAGE_GUIDE.md)** for tutorials
 2. **Explore [MCP Tools Reference](MCP_TOOLS_REFERENCE.md)** for all available tools
 3. **Upload your first document** via the web interface
-4. **Start using with Claude Desktop** for intelligent document analysis
+4. **Start using with any MCP client** (Claude, Copilot, etc.) for document workflows
 
 ## Getting Help
 

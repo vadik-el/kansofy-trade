@@ -1,8 +1,9 @@
-# Troubleshooting Guide 🔧
+# Engine Troubleshooting Guide 🔧
 
-Solutions to common issues and debugging strategies for Kansofy-Trade MCP Server.
+**Debugging the deterministic document engine. No AI mysteries - just predictable operations.**
 
 ## Table of Contents
+- [Engine vs Brain Issues](#engine-vs-brain-issues)
 - [Quick Fixes](#quick-fixes)
 - [Common Issues](#common-issues)
   - [Installation Problems](#installation-problems)
@@ -16,14 +17,32 @@ Solutions to common issues and debugging strategies for Kansofy-Trade MCP Server
 - [Advanced Debugging](#advanced-debugging)
 - [Getting Help](#getting-help)
 
+## Engine vs Brain Issues
+
+### Understanding What Can Go Wrong
+
+**Engine Issues (This Project)**:
+- ✅ Deterministic - same input always produces same error
+- ✅ Predictable - errors are reproducible
+- ✅ Debuggable - clear error messages, no AI black box
+- ✅ Local - all issues are on your machine
+
+**Brain Issues (AI Layer)**:
+- ❌ Variable responses from AI
+- ❌ API rate limits or quotas
+- ❌ Network connectivity to AI services
+- ❌ AI model hallucinations
+
+**If your issue is inconsistent or varies between runs, it's likely a Brain (AI) issue, not an Engine issue.**
+
 ## Quick Fixes
 
 | Problem | Quick Solution |
 |---------|---------------|
-| Claude can't find MCP tools | Restart Claude Desktop completely |
+| MCP client can't find engine | Restart your MCP client completely |
 | Upload fails | Check file size (<50MB) and format |
-| Search returns nothing | Verify documents are processed (status='completed') |
-| Slow performance | Run `update_embeddings()` and check system health |
+| Search returns nothing | Documents processed? This is SQL, not AI search |
+| Slow performance | Pre-compute embeddings, check SQLite performance |
 | Database locked | Close other connections, restart server |
 | Import errors | Activate virtual environment, reinstall requirements |
 
@@ -90,13 +109,13 @@ pip install --upgrade certifi
 pip install --index-url=https://pypi.python.org/simple/ -r requirements.txt
 ```
 
-### Claude Desktop Integration
+### MCP Client Integration
 
-#### Issue: Claude doesn't show Kansofy-Trade tools
+#### Issue: MCP client doesn't show engine operations
 
 **Symptoms:**
-- Claude responds "I don't have access to MCP tools"
-- Tools don't appear in Claude's capability list
+- AI responds "I don't have access to MCP tools"
+- Engine operations don't appear in capability list
 
 **Solutions:**
 
@@ -128,10 +147,11 @@ python mcp_server.py
 # Should see: "Starting Kansofy-Trade MCP Server..."
 ```
 
-4. **Check Claude Desktop logs:**
+4. **Check MCP client logs:**
 ```bash
-# macOS
+# Claude Desktop (macOS)
 tail -f ~/Library/Logs/Claude/mcp-server.log
+# Other clients - check respective logs
 
 # Look for errors like:
 # - "Failed to start server"
@@ -141,10 +161,10 @@ tail -f ~/Library/Logs/Claude/mcp-server.log
 
 5. **Complete restart:**
 ```bash
-# 1. Quit Claude Desktop completely
-# 2. Check no Claude processes running
-ps aux | grep Claude
-# 3. Start Claude Desktop fresh
+# 1. Quit MCP client completely
+# 2. Check no client processes running
+ps aux | grep [client-name]
+# 3. Start MCP client fresh
 ```
 
 #### Issue: "Failed to start MCP server"
@@ -279,6 +299,8 @@ process_pending_documents()
 
 #### Issue: Table extraction not working
 
+**Note**: This is Docling (rule-based), not AI. If tables aren't extracted, they don't match Docling's patterns.
+
 **Symptoms:**
 - Tables in PDF not extracted
 - `tables` field is empty or null
@@ -351,6 +373,8 @@ print(f"Total searchable documents: {all_docs['results_count']}")
 ```
 
 #### Issue: Vector search not working
+
+**Note**: Vectors are pre-computed once. Search is pure math (cosine similarity), not AI.
 
 **Symptoms:**
 - `vector_search` returns no results
@@ -660,16 +684,16 @@ def process_large_document(file_path):
 A: The system is tested with up to 100,000 documents. Performance depends on document size and complexity. For larger collections, consider PostgreSQL migration.
 
 **Q: Can I use this without Claude Desktop?**
-A: Yes! The web interface and REST API work independently. Only the MCP tools require Claude Desktop.
+A: Yes! Works with any MCP client (Claude, Copilot, etc.) or standalone via REST API.
 
 **Q: What file formats are supported?**
 A: PDF, TXT, CSV, HTML, and DOCX. PDF is the primary format with best support for tables and formatting.
 
 **Q: How accurate is the extraction?**
-A: Typically 95%+ for well-formatted documents. Accuracy depends on document quality, formatting, and complexity.
+A: Docling is deterministic - same document always gives same result. No AI variability. Accuracy depends on how well documents match Docling's rules.
 
 **Q: Can it handle scanned PDFs?**
-A: Not currently. Scanned PDFs require OCR, which is planned for a future release.
+A: No. Scanned PDFs need OCR (AI/ML). This engine is deterministic - no AI required.
 
 ### Technical Questions
 
@@ -677,10 +701,10 @@ A: Not currently. Scanned PDFs require OCR, which is planned for a future releas
 A: SQLite provides excellent performance for single-user scenarios, requires no setup, and includes FTS5 for full-text search. PostgreSQL migration path is available for scaling.
 
 **Q: How are embeddings generated?**
-A: Using the all-MiniLM-L6-v2 model from Sentence Transformers, creating 384-dimensional vectors for semantic search.
+A: Pre-computed once using all-MiniLM-L6-v2. Search is then pure math (cosine similarity) - no AI inference at search time.
 
 **Q: Is my data secure?**
-A: All processing happens locally. No data is sent to external services. Documents are stored in your local filesystem and SQLite database.
+A: 100% local, zero external dependencies. No AI APIs, no cloud services. Everything runs on your machine.
 
 **Q: Can I customize the extraction?**
 A: Yes, you can modify `app/services/document_processor.py` to add custom extraction logic for specific document types.

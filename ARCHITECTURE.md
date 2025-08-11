@@ -1,8 +1,9 @@
-# Architecture Documentation 🏗️
+# Engine Architecture 🏗️
 
-Complete technical architecture of the Kansofy-Trade MCP Server system.
+**The infrastructure layer for document workflows. Zero AI dependencies. 100% deterministic.**
 
 ## Table of Contents
+- [Engine vs Brain Architecture](#engine-vs-brain-architecture)
 - [System Overview](#system-overview)
 - [Component Architecture](#component-architecture)
 - [Data Flow](#data-flow)
@@ -14,9 +15,55 @@ Complete technical architecture of the Kansofy-Trade MCP Server system.
 - [Performance Architecture](#performance-architecture)
 - [Deployment Architecture](#deployment-architecture)
 
+## Engine vs Brain Architecture
+
+### The Separation of Concerns
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    THE BRAIN (Your AI)                   │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  │
+│  │    Claude    │  │   Copilot    │  │  Any MCP AI  │  │
+│  │  (Anthropic) │  │  (Microsoft) │  │   (Future)   │  │
+│  └──────────────┘  └──────────────┘  └──────────────┘  │
+│                                                          │
+│  Intelligence Layer: Understands intent, makes          │
+│  decisions, orchestrates operations, generates insights │
+└─────────────────────────────────────────────────────────┘
+                            ↕
+                    MCP Protocol (Open Standard)
+                            ↕
+┌─────────────────────────────────────────────────────────┐
+│                  THE ENGINE (Kansofy-Trade)              │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  │
+│  │   Docling    │  │  SQLite FTS5 │  │ Pre-computed │  │
+│  │  Extraction  │  │    Search    │  │   Vectors    │  │
+│  └──────────────┘  └──────────────┘  └──────────────┘  │
+│                                                          │
+│  Infrastructure Layer: Deterministic operations,        │
+│  document extraction, search, storage - No AI Required  │
+└─────────────────────────────────────────────────────────┘
+```
+
+### Why This Architecture Matters
+
+**The Engine (This Project)**:
+- ✅ Deterministic: Same input → same output, always
+- ✅ No AI Required: Runs without any ML models
+- ✅ Offline-capable: Everything runs locally
+- ✅ No API keys: No external dependencies
+- ✅ Predictable costs: No per-token charges
+- ✅ Fast: No inference latency
+
+**The Brain (Your Choice)**:
+- 🧠 Any AI platform via MCP
+- 🧠 Swap providers without changing infrastructure
+- 🧠 Use multiple AIs for different tasks
+- 🧠 Future-proof as AI landscape evolves
+
 ## System Overview
 
-Kansofy-Trade implements a **3-tier architecture** with clear separation of concerns:
+The engine implements a **3-tier architecture** with clear separation of concerns:
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -92,7 +139,7 @@ MCP Server
 
 #### 2. Document Processor (`app/services/document_processor.py`)
 
-**Purpose**: Extract intelligence from various document formats
+**Purpose**: Extract content from documents using Docling (deterministic, no AI)
 
 **Responsibilities:**
 - Document parsing and text extraction
@@ -101,28 +148,28 @@ MCP Server
 - Metadata extraction
 - Quality scoring
 
-**Processing Pipeline:**
+**Deterministic Processing Pipeline:**
 ```python
 Document Input
     ↓
-Format Detection (PDF/TXT/CSV/HTML/DOCX)
+Format Detection (file extension check)
     ↓
-Docling Extraction
+Docling Extraction (IBM rule-based parser)
     ↓
-Content Structuring
+Content Structuring (pattern matching)
     ↓
-Table Extraction
+Table Extraction (layout analysis, no OCR)
     ↓
-Entity Recognition
+Entity Recognition (regex patterns)
     ↓
-Quality Assessment
+Quality Assessment (rule-based scoring)
     ↓
-Structured Output (JSON)
+Structured Output (JSON) - Same every time
 ```
 
 #### 3. Vector Store (`app/core/vector_store.py`)
 
-**Purpose**: Enable semantic search through embeddings
+**Purpose**: Pre-compute embeddings for similarity search (no AI at search time)
 
 **Responsibilities:**
 - Generate embeddings using Sentence Transformers
@@ -130,17 +177,17 @@ Structured Output (JSON)
 - Similarity calculations
 - Duplicate detection
 
-**Architecture:**
+**Pre-computation Architecture:**
 ```python
 Text Input
     ↓
 Chunking (512 tokens)
     ↓
-Embedding Generation (all-MiniLM-L6-v2)
+Embedding Generation (one-time computation)
     ↓
-384-dimensional vectors
+384-dimensional vectors (stored)
     ↓
-Cosine Similarity Search
+Cosine Similarity (pure math at search time)
 ```
 
 #### 4. Search Engine
@@ -326,16 +373,18 @@ CREATE INDEX idx_embeddings_document ON document_embeddings(document_id);
 
 ### Core Technologies
 
-| Component | Technology | Version | Purpose |
-|-----------|------------|---------|---------|
-| Language | Python | 3.9+ | Primary development language |
-| MCP Framework | mcp | 1.0+ | Model Context Protocol implementation |
-| Web Framework | FastAPI | 0.100+ | REST API and web interface |
-| Database | SQLite | 3.35+ | Primary data storage |
-| Search | SQLite FTS5 | Built-in | Full-text search |
-| Document Processing | Docling | 2.0+ | Multi-format extraction |
-| Embeddings | Sentence Transformers | 2.2+ | Semantic search |
-| Async | asyncio/aiosqlite | 0.19+ | Asynchronous operations |
+| Component | Technology | Version | Purpose | AI Required? |
+|-----------|------------|---------|---------|-------------|
+| Language | Python | 3.9+ | Primary development language | No |
+| MCP Framework | mcp | 1.0+ | Open protocol for AI communication | No |
+| Web Framework | FastAPI | 0.100+ | REST API and web interface | No |
+| Database | SQLite | 3.35+ | Primary data storage | No |
+| Search | SQLite FTS5 | Built-in | Deterministic full-text search | No |
+| Document Processing | Docling | 2.0+ | Rule-based extraction | No |
+| Embeddings | Sentence Transformers | 2.2+ | One-time vector computation | No* |
+| Async | asyncio/aiosqlite | 0.19+ | Asynchronous operations | No |
+
+*Embeddings are pre-computed once, no AI needed at search time
 
 ### Dependencies Tree
 
@@ -700,25 +749,26 @@ MAX_UPLOAD_SIZE=52428800  # 50MB
 
 ## System Boundaries
 
-### What the System Does
+### What the Engine Does (No AI Required)
 
-✅ **Core Capabilities:**
-- Multi-format document processing (PDF, TXT, CSV, HTML, DOCX)
-- Intelligent text and table extraction
-- Full-text and semantic search
-- Duplicate detection
-- MCP integration with Claude Desktop
+✅ **Engine Capabilities:**
+- Multi-format document processing via Docling (deterministic)
+- Rule-based text and table extraction
+- SQL full-text search (FTS5)
+- Pre-computed similarity search
+- Content hash duplicate detection
+- MCP protocol implementation
 - RESTful API for integrations
 
-### What the System Doesn't Do
+### What the Engine Doesn't Do (Requires Brain/AI)
 
-❌ **Current Limitations:**
-- Real-time collaboration
-- Multi-tenant isolation
-- Document generation
-- OCR for scanned documents
-- Language translation
-- External API integrations
+❌ **Needs Intelligence Layer:**
+- Understanding user intent
+- Making business decisions
+- Generating new content
+- OCR for scanned documents (needs AI/ML)
+- Language translation (needs AI/ML)
+- Workflow orchestration logic
 
 ### Future Architecture Evolution
 
@@ -750,7 +800,7 @@ graph LR
 
 ### ADR-001: SQLite with FTS5
 **Decision**: Use SQLite with FTS5 for primary storage and search
-**Rationale**: Simplicity, performance for <100K documents, zero configuration
+**Rationale**: Deterministic SQL queries, no AI inference needed, zero configuration
 **Trade-offs**: Limited concurrent writes, single-node limitation
 
 ### ADR-002: Local File Storage
@@ -758,27 +808,28 @@ graph LR
 **Rationale**: Simplicity, direct access, no external dependencies
 **Trade-offs**: Not suitable for distributed deployment
 
-### ADR-003: Sentence Transformers for Embeddings
-**Decision**: Use all-MiniLM-L6-v2 model for embeddings
-**Rationale**: Good balance of quality and performance, 384 dimensions
-**Trade-offs**: Requires ~50MB model download
+### ADR-003: Pre-computed Embeddings
+**Decision**: Pre-compute all embeddings, search is pure math
+**Rationale**: No AI inference at search time, deterministic similarity scores
+**Trade-offs**: Storage space for vectors, one-time computation cost
 
-### ADR-004: Async Architecture
-**Decision**: Use asyncio throughout the application
-**Rationale**: Better resource utilization, non-blocking I/O
-**Trade-offs**: Increased complexity, debugging challenges
+### ADR-004: Docling for Document Processing
+**Decision**: Use IBM's Docling for all document extraction
+**Rationale**: Rule-based, deterministic, no AI/ML required, handles tables
+**Trade-offs**: May miss some edge cases that AI could handle
 
 ---
 
 ## Summary
 
-The Kansofy-Trade architecture prioritizes:
+The Kansofy-Trade engine architecture prioritizes:
 
-1. **Simplicity**: Minimal dependencies, easy to understand
-2. **Performance**: Sub-second response times for most operations
-3. **Reliability**: Comprehensive error handling and recovery
-4. **Extensibility**: Clear interfaces for adding new capabilities
-5. **Local-First**: Everything runs on your machine, no external dependencies
+1. **Determinism**: Same input → same output, always
+2. **No AI Dependencies**: Runs without any ML models or inference
+3. **Performance**: Sub-second response times, no inference latency
+4. **Reliability**: Predictable behavior, comprehensive error handling
+5. **Vendor Agnostic**: Works with any AI via MCP protocol
+6. **Local-First**: Everything runs on your machine, offline-capable
 
 This architecture supports the current scale while providing clear paths for evolution as requirements grow.
 

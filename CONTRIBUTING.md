@@ -1,8 +1,11 @@
-# Contributing to Kansofy-Trade 🤝
+# Contributing to the Engine 🤝
 
-Thank you for your interest in contributing to Kansofy-Trade! This guide will help you get started with contributing to the project.
+**Building the deterministic infrastructure for document workflows. No AI required.**
+
+Thank you for contributing to Kansofy-Trade! This is the **engine** layer - deterministic document operations that work the same every time.
 
 ## Table of Contents
+- [Engine vs Brain: Contribution Boundaries](#engine-vs-brain-contribution-boundaries)
 - [Code of Conduct](#code-of-conduct)
 - [How to Contribute](#how-to-contribute)
 - [Development Setup](#development-setup)
@@ -13,6 +16,99 @@ Thank you for your interest in contributing to Kansofy-Trade! This guide will he
 - [Adding New Features](#adding-new-features)
 - [Documentation](#documentation)
 - [Community](#community)
+
+## Engine vs Brain: Contribution Boundaries
+
+### What Belongs in the Engine (This Project)
+
+✅ **Engine Contributions (Welcome Here)**:
+- **Deterministic Operations**: Same input → same output, always
+- **Document Processing**: Docling extraction, parsing, formatting
+- **Search Infrastructure**: SQL queries, FTS5 optimization, vector math
+- **MCP Protocol**: Tool definitions, protocol handling, response formatting
+- **Storage & Retrieval**: Database schemas, file handling, caching
+- **Performance**: Query optimization, batch processing, parallelization
+- **Rule-Based Logic**: Regex patterns, validation rules, deterministic scoring
+
+**Examples of Good Engine Contributions**:
+```python
+# ✅ Deterministic entity extraction
+def extract_invoice_number(text: str) -> str:
+    pattern = r'Invoice[\s#:]*([A-Z0-9-]+)'
+    match = re.search(pattern, text, re.IGNORECASE)
+    return match.group(1) if match else None
+
+# ✅ SQL-based search
+def search_by_date_range(start: date, end: date):
+    return db.query("SELECT * FROM documents WHERE date BETWEEN ? AND ?", start, end)
+
+# ✅ Pre-computed similarity
+def find_similar(embedding: list[float], threshold: float = 0.8):
+    # Pure math - cosine similarity on pre-computed vectors
+    return cosine_similarity(embedding, stored_embeddings)
+```
+
+### What Belongs in the Brain (Not Here)
+
+❌ **Brain Contributions (Use Your Own AI)**:
+- **AI/ML Models**: Training, inference, fine-tuning
+- **Natural Language Understanding**: Intent detection, sentiment analysis
+- **Decision Making**: Workflow orchestration, business logic
+- **Content Generation**: Summaries, responses, translations
+- **OCR/Vision**: Image processing, handwriting recognition
+- **Predictions**: Forecasting, classification, recommendations
+
+**Examples to Avoid**:
+```python
+# ❌ Don't add AI inference
+def classify_document(text):
+    # This uses AI - belongs in brain layer
+    return openai.classify(text)
+
+# ❌ Don't add decision logic  
+def should_approve_invoice(invoice):
+    # Business logic - belongs in brain
+    if invoice.amount > threshold:
+        return requires_manager_approval()
+
+# ❌ Don't add content generation
+def summarize_document(text):
+    # AI generation - belongs in brain
+    return llm.generate_summary(text)
+```
+
+### The Line Between Engine and Brain
+
+| Operation | Engine (Here) | Brain (Not Here) |
+|-----------|--------------|------------------|
+| Extract tables | Docling rules ✅ | Understand table meaning ❌ |
+| Find invoices | SQL search ✅ | Decide which to pay ❌ |
+| Match patterns | Regex ✅ | Understand context ❌ |
+| Calculate similarity | Vector math ✅ | Judge relevance ❌ |
+| Store documents | Database ✅ | Categorize by meaning ❌ |
+| Parse dates | Pattern matching ✅ | Understand urgency ❌ |
+
+### Why This Separation Matters
+
+1. **Determinism**: Engine always produces same results
+2. **No AI Dependencies**: Runs without API keys or models
+3. **Vendor Agnostic**: Works with any AI layer
+4. **Predictable Costs**: No per-token charges
+5. **Offline Capable**: Everything works locally
+
+### Contributing Philosophy
+
+**Engine Philosophy**: "Can this be solved with rules, patterns, or math?"
+- If YES → Contribute here
+- If NO (needs AI) → Implement in your brain layer
+
+**Questions to Ask**:
+1. Will this operation always produce the same output for the same input?
+2. Can this be implemented without ML models or AI inference?
+3. Does this work offline without API calls?
+4. Is this about infrastructure rather than intelligence?
+
+If you answered YES to all → Perfect engine contribution!
 
 ## Code of Conduct
 
@@ -35,15 +131,17 @@ We are committed to providing a welcoming and inclusive environment for all cont
 
 ### Types of Contributions
 
-We welcome various types of contributions:
+We welcome engine-layer contributions:
 
-- 🐛 **Bug Reports**: Help us identify and fix issues
-- ✨ **Feature Requests**: Suggest new capabilities
+- 🐛 **Bug Reports**: Help us identify and fix deterministic issues
+- ✨ **Feature Requests**: Suggest new engine capabilities (no AI)
 - 📚 **Documentation**: Improve guides and API docs
-- 🔧 **Code Contributions**: Submit fixes and features
-- 🧪 **Testing**: Add test coverage
+- 🔧 **Code Contributions**: Submit deterministic fixes and features
+- 🧪 **Testing**: Add test coverage for predictable operations
 - 🎨 **UI/UX Improvements**: Enhance the web interface
 - 🌍 **Translations**: Help internationalize the project
+- ⚡ **Performance**: Optimize queries, caching, batch processing
+- 🔍 **Search**: Improve FTS5, vector math, SQL optimization
 
 ### First Time Contributors
 
@@ -423,6 +521,26 @@ Add screenshots for UI changes
 
 ## Architecture Guidelines
 
+### Maintaining Engine Determinism
+
+**Every contribution must maintain determinism:**
+```python
+# ✅ GOOD: Deterministic
+def calculate_document_score(doc):
+    score = 0
+    if doc.has_tables: score += 0.2
+    if doc.has_entities: score += 0.3
+    if len(doc.text) > 1000: score += 0.5
+    return score  # Always same score for same doc
+
+# ❌ BAD: Non-deterministic
+def calculate_document_score(doc):
+    score = random.random()  # Random!
+    if datetime.now().hour > 12: score += 0.5  # Time-dependent!
+    score += ai_quality_check(doc)  # AI-dependent!
+    return score
+```
+
 ### Adding New MCP Tools
 
 1. **Define tool in `mcp_server.py`:**
@@ -518,15 +636,20 @@ PROCESSORS = {
 ### Feature Development Process
 
 1. **Discuss First**: Open an issue to discuss the feature
-2. **Design Document**: For major features, create a design doc
-3. **Prototype**: Build a minimal working version
-4. **Tests**: Write comprehensive tests
-5. **Documentation**: Update all relevant docs
-6. **Performance**: Ensure no regression
-7. **Security**: Consider security implications
+2. **Verify Engine Scope**: Confirm it's deterministic (no AI needed)
+3. **Design Document**: For major features, create a design doc
+4. **Prototype**: Build a minimal working version
+5. **Tests**: Write comprehensive tests (must be deterministic)
+6. **Documentation**: Update all relevant docs
+7. **Performance**: Ensure no regression
+8. **Security**: Consider security implications
+9. **Determinism Check**: Verify same input → same output
 
 ### Feature Checklist
 
+- [ ] **Is deterministic** (same input → same output)
+- [ ] **No AI required** (no models, no inference)
+- [ ] **Works offline** (no external API calls)
 - [ ] Follows existing architecture patterns
 - [ ] Includes unit tests (>80% coverage)
 - [ ] Includes integration tests

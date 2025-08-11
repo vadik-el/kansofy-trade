@@ -1,55 +1,62 @@
-# MCP Tools Reference 🛠️
+# Engine Capabilities Reference 🛠️
 
-Complete API documentation for all 14 Kansofy-Trade MCP tools available in Claude Desktop.
+**14 deterministic operations that power your document workflows. No AI required.**
+
+This engine provides the infrastructure for document operations - the actual intelligence comes from your AI assistant (Claude, Copilot, or any MCP client).
 
 ## Table of Contents
 - [Quick Reference](#quick-reference)
-- [Document Management Tools](#document-management-tools)
+- [Workflow Operations](#workflow-operations)
   - [upload_document](#1-upload_document)
   - [get_document_details](#2-get_document_details)
   - [get_document_tables](#3-get_document_tables)
   - [get_document_json](#4-get_document_json)
-- [Search Tools](#search-tools)
+- [Discovery Operations](#discovery-operations)
   - [search_documents](#5-search_documents)
   - [vector_search](#6-vector_search)
   - [find_duplicates](#7-find_duplicates)
   - [check_duplicate_by_hash](#8-check_duplicate_by_hash)
-- [Analysis Tools](#analysis-tools)
+- [Intelligence Operations](#intelligence-operations)
   - [analyze_document_content](#9-analyze_document_content)
   - [get_document_statistics](#10-get_document_statistics)
-- [System Tools](#system-tools)
+- [Engine Management](#engine-management)
   - [process_pending_documents](#11-process_pending_documents)
   - [update_embeddings](#12-update_embeddings)
   - [get_system_health](#13-get_system_health)
 - [Advanced Usage](#advanced-usage)
-- [Tool Combinations](#tool-combinations)
+- [Operation Workflows](#operation-workflows)
 - [Error Handling](#error-handling)
 
 ## Quick Reference
 
-| Tool | Purpose | Example Use Case |
+**What This Enables**: Process 60-129 documents per shipment in minutes, not hours.
+
+| Operation | Engine Capability | What This Enables |
 |------|---------|------------------|
-| `upload_document` | Upload & process documents | "Upload this invoice PDF" |
-| `search_documents` | Full-text search with FTS5 | "Find contracts with payment terms" |
-| `vector_search` | Semantic similarity search | "Find documents similar to this" |
-| `get_document_details` | Retrieve document info | "Show me details of document #5" |
-| `analyze_document_content` | Extract insights | "Analyze patterns in shipping docs" |
-| `get_document_statistics` | Collection metrics | "How many documents are processed?" |
-| `find_duplicates` | Detect similar documents | "Check if this is a duplicate" |
-| `update_embeddings` | Enable vector search | "Update embeddings for new docs" |
-| `get_document_tables` | Extract tables | "Get tables from this statement" |
-| `process_pending_documents` | Batch processing | "Process all uploaded documents" |
-| `get_system_health` | System status | "Check system health" |
-| `get_document_json` | Full JSON export | "Export document as JSON" |
-| `check_duplicate_by_hash` | Content hash check | "Is this exact duplicate?" |
+| `upload_document` | Docling extraction (no AI) | Process PDFs, extract tables deterministically |
+| `search_documents` | SQLite FTS5 search (no AI) | Find documents instantly with SQL |
+| `vector_search` | Pre-computed embeddings (no AI) | Discover similar documents without inference |
+| `get_document_details` | Structured data retrieval | Access extracted information |
+| `analyze_document_content` | Pattern detection (rule-based) | Identify entities and patterns |
+| `get_document_statistics` | SQL aggregation | Track processing metrics |
+| `find_duplicates` | Hash comparison | Detect duplicates deterministically |
+| `update_embeddings` | Batch vector computation | Pre-compute for fast search |
+| `get_document_tables` | Table extraction (Docling) | Extract tables without OCR/AI |
+| `process_pending_documents` | Queue processing | Handle batch operations |
+| `get_system_health` | Engine diagnostics | Monitor performance |
+| `get_document_json` | Data export | Export structured data |
+| `check_duplicate_by_hash` | SHA-256 verification | Exact duplicate detection |
 
 ---
 
-## Document Management Tools
+## Workflow Operations
+
+**Engine Infrastructure** (No AI Required) → **Your AI Adds Intelligence**
 
 ### 1. upload_document
 
-Upload and process documents for intelligence extraction.
+**Engine Operation**: Deterministic document extraction using Docling (IBM Research).
+**No AI Required**: Same document always produces same output.
 
 **Parameters:**
 | Parameter | Type | Required | Description | Default |
@@ -233,11 +240,14 @@ json_data = get_document_json(document_id=42)
 
 ---
 
-## Search Tools
+## Discovery Operations
+
+**Pure Database Operations** - No AI inference needed for search.
 
 ### 5. search_documents
 
-Full-text search using SQLite FTS5 with advanced query syntax.
+**Engine Operation**: SQLite FTS5 full-text search.
+**Deterministic**: Database queries, not AI predictions.
 
 **Parameters:**
 | Parameter | Type | Required | Description | Default |
@@ -303,7 +313,8 @@ search_documents("price OR pricing OR \"unit cost\"")
 
 ### 6. vector_search
 
-Semantic search using vector embeddings to find similar documents by meaning.
+**Engine Operation**: Pre-computed vector similarity (cosine distance).
+**No AI Inference**: Embeddings are pre-calculated, search is pure math.
 
 **Parameters:**
 | Parameter | Type | Required | Description | Default |
@@ -426,11 +437,14 @@ result = check_duplicate_by_hash(document_id=42)
 
 ---
 
-## Analysis Tools
+## Intelligence Operations
+
+**Pattern Recognition** - Rule-based extraction, not AI inference.
 
 ### 9. analyze_document_content
 
-Analyze documents for patterns, entities, and insights.
+**Engine Operation**: Rule-based pattern matching and entity extraction.
+**Deterministic**: Regular expressions and pattern rules, not AI.
 
 **Parameters:**
 | Parameter | Type | Required | Description | Default |
@@ -529,7 +543,9 @@ stats = get_document_statistics(detailed=True)
 
 ---
 
-## System Tools
+## Engine Management
+
+**Infrastructure Operations** - Maintain and monitor the engine.
 
 ### 11. process_pending_documents
 
@@ -650,9 +666,9 @@ detailed_health = get_system_health(include_metrics=True)
 
 ## Advanced Usage
 
-### Tool Combinations
+### Operation Workflows
 
-**Document Analysis Workflow:**
+**Document Processing Pipeline (100% Deterministic):**
 ```python
 # 1. Upload document
 doc = upload_document(file_path="contract.pdf", category="contract")
@@ -807,7 +823,9 @@ if not query:
 
 ---
 
-## Tool Limits and Constraints
+## Engine Performance Specifications
+
+**All operations are deterministic** - no variability from AI models.
 
 | Tool | Rate Limit | Max Input Size | Timeout |
 |------|------------|----------------|---------|
@@ -820,13 +838,15 @@ if not query:
 
 ---
 
-## Integration Examples with Claude
+## Integration Examples with Any AI Assistant
+
+**Works with**: Claude Desktop, Microsoft Copilot, or any MCP-compatible client.
 
 ### Example 1: Document Upload and Analysis
 ```
 User: "I have an invoice PDF on my desktop. Can you analyze it?"
 
-Claude: I'll help you upload and analyze that invoice. Let me process it for you.
+AI Assistant: I'll help you upload and analyze that invoice. Let me process it for you.
 
 [Calls upload_document with the file path]
 [Waits for processing]
@@ -847,7 +867,7 @@ The invoice contains a table with product details and appears to be for copper m
 ```
 User: "Find all contracts that mention arbitration clauses"
 
-Claude: I'll search for contracts containing arbitration clauses.
+AI Assistant: I'll search for contracts containing arbitration clauses.
 
 [Calls search_documents with query="contract AND arbitration"]
 [If few results, calls vector_search with "legal contracts with dispute resolution arbitration clauses"]

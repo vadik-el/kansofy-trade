@@ -1,58 +1,84 @@
-# Kansofy-Trade 🚀
+<div align="center">
+  <img src="logo.svg" alt="Kansofy-Trade Logo" width="200" />
+  
+  # Kansofy-Trade
+  
+  **Open-source MCP server for document workflow simplification.**
+</div>
 
-**Transform Documents into Intelligence. In 30 Seconds.**
+--- Built on IBM's [Docling](https://github.com/DS4SD/docling) for powerful document extraction.
 
-The MCP server that gives Claude Desktop superpowers for document analysis, semantic search, and intelligent extraction from your supply chain documents.
+## 🚀 Works Out of the Box
 
-[![MCP Compatible](https://img.shields.io/badge/MCP-1.0-blue)](https://modelcontextprotocol.io)
-[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Documentation](https://img.shields.io/badge/docs-comprehensive-green)](./docs)
+**No AI needed for document processing. No API keys. No cloud dependencies. Works with any AI platform.**
 
-## ⚡ What Makes Kansofy-Trade Special?
+This MCP server runs 100% locally using Docling for document extraction - no AI required for the actual processing. Connect it to any MCP-compatible AI assistant:
+- **Claude Desktop** by Anthropic
+- **Microsoft Copilot** via Copilot Studio  
+- **Any MCP-compatible client** (growing ecosystem)
 
-**Real Intelligence, Not Just Text Extraction**
-- 🧠 **Semantic Understanding**: Find documents by meaning, not just keywords
-- 📊 **Automatic Table Extraction**: PDFs with complex tables? No problem
-- 🔍 **14 Powerful MCP Tools**: From upload to analysis, everything Claude needs
-- 🚄 **SQLite FTS5**: Blazing-fast full-text search with phrase matching
-- 🎯 **Vector Embeddings**: Find similar documents even with different wording
-- 📈 **100% Local Processing**: Your documents never leave your machine
+## 🔌 Vendor & Model Agnostic
 
-## 🎥 See It In Action
+**One engine, any AI platform.**
 
-```python
-# Upload and process a complex invoice PDF
-> upload_document(file_path="invoice_2024.pdf", category="invoice")
-✅ Document processed: 2.3 seconds
-   - Extracted: 15 line items, 3 tables, 12 entities
-   - Confidence: 98.5%
+The Model Context Protocol (MCP) is an open standard. This means:
+- ✅ Not locked to Anthropic or Claude
+- ✅ Works with Microsoft Copilot Studio
+- ✅ Compatible with any MCP implementation
+- ✅ Future-proof as more platforms adopt MCP
+- ✅ Use with GPT, Gemini, Llama, or any model
 
-# Find all documents mentioning copper shipments from Chile
-> search_documents("copper AND Chile", limit=5)
-📄 Found 5 documents:
-   1. Contract_CU_2024.pdf - "...10,000 MT copper cathodes from Chile..."
-   2. Invoice_March.pdf - "...Chilean copper shipment arrived..."
-   
-# Semantic search finds related documents
-> vector_search("metal commodity trading contracts")
-🔍 Similar documents (by meaning):
-   1. Copper_Purchase_Agreement.pdf (similarity: 0.92)
-   2. Aluminum_Contract_2024.pdf (similarity: 0.87)
-```
+Your document infrastructure shouldn't depend on a single AI vendor. Kansofy-Trade ensures it doesn't.
 
-## 🚀 Quick Start (3 Steps)
+## 🏗️ The Engine, Not the Brain
 
-### 1. Install
+Kansofy-Trade is the **engine** that enables document operations:
+- **Powered by Docling**: IBM Research's document parser (no AI needed)
+- **Deterministic Processing**: Same document = same output every time
+- **MCP Native**: Works with any MCP-compatible client
+- **Zero Configuration**: Install and run — no setup required
+- **100% Local**: Your documents never leave your machine
+
+The **brain** (workflow intelligence, trade expertise, compliance logic) can come from any AI model or commercial solution - but the engine runs without any AI.
+
+## 📚 Built on Open Standards
+
+### Docling by IBM Research
+This project leverages [Docling](https://github.com/DS4SD/docling), IBM's advanced document conversion technology:
+- **Rule-based extraction** - No AI/ML required
+- Extracts text, tables, and structure from PDFs, DOCX, XLSX, PPTX, and more
+- Maintains document layout and formatting intelligence  
+- Handles complex multi-column layouts and embedded tables
+- Open-source (MIT licensed) and actively maintained
+
+### Model Context Protocol (MCP)
+Open standard for AI-tool communication:
+- Works with Claude Desktop (Anthropic)
+- Compatible with Copilot Studio (Microsoft)
+- Supports any MCP client implementation
+- Vendor-neutral protocol specification
+
+## 🎯 What This Is (And Isn't)
+
+**This IS:**
+- ✅ A vendor-agnostic MCP server with 14 document tools
+- ✅ Deterministic document extraction via Docling (no AI)
+- ✅ Full-text and semantic search capabilities
+- ✅ Production-ready document processing engine
+- ✅ 100% local, offline-capable, no external dependencies
+
+**This IS NOT:**
+- ❌ An AI-powered document processor (it's deterministic)
+- ❌ Tied to any specific AI vendor
+- ❌ An AI model (it's infrastructure for any AI)
+- ❌ A complete workflow automation solution
+- ❌ The commercial Kansofy product
+
+## ⚡ Quick Start
+
+### With Claude Desktop
 ```bash
-git clone https://github.com/kansofy/kansofy-trade.git
-cd kansofy-trade
-pip install -r requirements.txt
-```
-
-### 2. Configure Claude Desktop
-Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_desktop_config.json`):
-```json
+# Add to ~/Library/Application Support/Claude/claude_desktop_config.json
 {
   "mcpServers": {
     "kansofy-trade": {
@@ -63,152 +89,159 @@ Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_
 }
 ```
 
-### 3. Start Using
+### With Microsoft Copilot Studio
 ```bash
-# Option A: Use with Claude Desktop (recommended)
-# Just restart Claude Desktop - the MCP server starts automatically
-
-# Option B: Web interface for uploads
-python -m uvicorn app.main:app --port 8000
-# Open http://localhost:8000
+# Configure in Copilot Studio as external tool
+# Point to the MCP server endpoint
+# Use the standard MCP protocol
 ```
 
-That's it! Claude can now process your documents with commands like:
-- "Upload and analyze this invoice"
-- "Find all contracts mentioning payment terms"
-- "Show me documents similar to this purchase order"
+### With Any MCP Client
+```bash
+# Start the MCP server
+python mcp_server.py
+
+# Connect any MCP-compatible client
+# Server speaks standard MCP protocol
+```
+
+## 🛠️ What You Get
+
+### Document Processing (No AI Required)
+```python
+# Docling extracts everything deterministically
+upload_document("complex_invoice.pdf")
+# ✓ Text extracted (rule-based)
+# ✓ Tables preserved (pattern matching)
+# ✓ Structure maintained (document parsing)
+# ✓ Same input = same output every time
+```
+
+### Intelligent Search (Still No AI)
+```python
+# Full-text search with SQLite FTS5
+search_documents("payment terms net 30")
+
+# Semantic similarity with pre-computed embeddings
+vector_search("documents about shipping delays")
+
+# Find duplicates using hashing
+find_duplicates()
+```
+
+### MCP Tools for Any AI Assistant
+All 14 tools work instantly with any MCP client:
+- `upload_document` - Process any document format (no AI)
+- `search_documents` - Lightning-fast full-text search (SQL)
+- `vector_search` - Find similar documents (embeddings)
+- `get_document_tables` - Extract tables from PDFs (Docling)
+- [... and 10 more tools]
+
+## 🧠 The Brain Lives Elsewhere
+
+This engine provides the **infrastructure** (no AI). The **intelligence** comes from:
+
+### Your AI Assistant (Claude, Copilot, etc.)
+The AI provides the intelligence to:
+- Understand your intent
+- Orchestrate document operations
+- Make decisions based on content
+- Generate insights and summaries
+
+### Your Own Implementation
+Build your own workflows on top:
+- Custom document classification
+- Business rule validation
+- Workflow orchestration
+- Integration patterns
+
+### Commercial Solutions
+Production-ready intelligence:
+- **Kansofy Trade Cloud**: Full SaaS with trade workflows
+- **Kansofy Enterprise**: Self-hosted with compliance engine
+- **Professional Services**: Custom workflow development
+
+## 📊 How It Works Without AI
+
+### Document Processing Pipeline
+```
+PDF/DOCX → Docling (rule-based) → Structured Data → SQLite
+         ↓
+    No AI needed
+    Deterministic
+    100% reproducible
+```
+
+### Search Pipeline
+```
+Query → FTS5 (SQL) → Results
+      → Embeddings (pre-computed) → Similarity
+      
+No AI inference at search time
+```
+
+## 🌐 Platform Compatibility
+
+| Platform | Status | Configuration |
+|----------|--------|---------------|
+| Claude Desktop | ✅ Tested | Native support |
+| Microsoft Copilot | ✅ Compatible | Via Copilot Studio |
+| OpenAI GPTs | 🔄 Planned | MCP bridge needed |
+| Google Gemini | 🔄 Planned | MCP adapter |
+| Open Source LLMs | ✅ Ready | Any MCP client |
+
+## 🤝 Why This Architecture Matters
+
+**No AI in the Engine Means:**
+- Deterministic results (same input = same output)
+- No API costs for document processing
+- Works offline completely
+- No rate limits or quotas
+- Full data privacy (nothing leaves your machine)
+- Predictable performance
+
+**Any AI for the Brain Means:**
+- Choose your preferred AI assistant
+- Switch providers without changing infrastructure
+- Use multiple AIs for different tasks
+- Future-proof as AI landscape evolves
+
+## 📈 When You Need More
+
+You'll know it's time for commercial when:
+- [ ] Processing >100 documents daily
+- [ ] Need trade-specific workflows
+- [ ] Require compliance validation
+- [ ] Want pre-built intelligence
+- [ ] ROI justifies enterprise features
+
+## 🔗 Technical Foundation
+
+- **Document Processing**: [Docling](https://github.com/DS4SD/docling) by IBM Research (no AI)
+- **Protocol**: [Model Context Protocol](https://modelcontextprotocol.io) (open standard)
+- **Search**: SQLite with FTS5 extension (deterministic SQL)
+- **Embeddings**: Sentence-transformers (pre-computed, no inference)
+- **Server**: FastAPI + Python 3.9+ (standard web framework)
 
 ## 📚 Documentation
 
 | Guide | Description |
 |-------|-------------|
-| [📦 Installation](INSTALLATION.md) | Complete setup with troubleshooting |
-| [🛠️ MCP Tools Reference](MCP_TOOLS_REFERENCE.md) | All 14 tools with examples |
-| [🏗️ Architecture](ARCHITECTURE.md) | System design and data flow |
-| [📖 Usage Guide](USAGE_GUIDE.md) | Tutorials and workflows |
-| [🔧 Troubleshooting](TROUBLESHOOTING.md) | Common issues and solutions |
-| [🤝 Contributing](CONTRIBUTING.md) | How to contribute |
+| [Installation](INSTALLATION.md) | Complete setup guide |
+| [MCP Tools](MCP_TOOLS_REFERENCE.md) | All 14 tools documented |
+| [Architecture](ARCHITECTURE.md) | System design & components |
+| [Usage Guide](USAGE_GUIDE.md) | Examples and workflows |
+| [Platform Compatibility](PLATFORM_COMPATIBILITY.md) | Multi-platform setup |
+| [Troubleshooting](TROUBLESHOOTING.md) | Common issues and solutions |
+| [Contributing](CONTRIBUTING.md) | How to contribute |
 
-## 🎯 Perfect For
+## 🙏 Acknowledgements
 
-- **Supply Chain Teams**: Process invoices, contracts, shipping documents
-- **Finance Teams**: Extract data from statements, reports, confirmations
-- **Legal Teams**: Search through contracts, find similar clauses
-- **Operations**: Track documents, find duplicates, maintain compliance
-
-## 🛠️ Core Features
-
-### Document Intelligence
-- ✅ **Multi-format Support**: PDF, TXT, CSV, HTML, DOCX
-- ✅ **Automatic Processing**: Upload → Extract → Index → Ready
-- ✅ **Table Extraction**: Complex tables converted to structured data
-- ✅ **Entity Recognition**: Names, dates, amounts, locations
-- ✅ **Duplicate Detection**: Content-based deduplication
-
-### Search Capabilities
-- ✅ **Full-text Search**: SQLite FTS5 with highlighting
-- ✅ **Semantic Search**: Vector embeddings for meaning-based search
-- ✅ **Boolean Operators**: AND, OR, NOT, phrase matching
-- ✅ **Wildcards**: Pattern matching with *
-
-### MCP Integration
-- ✅ **14 Native Tools**: Complete document lifecycle management
-- ✅ **Claude Desktop Ready**: Zero configuration after setup
-- ✅ **Streaming Responses**: Real-time processing feedback
-- ✅ **Error Recovery**: Graceful handling with clear messages
-
-## 🏗️ Architecture at a Glance
-
-```
-┌─────────────────┐     ┌──────────────┐     ┌─────────────┐
-│  Claude Desktop │────▶│  MCP Server  │────▶│   SQLite    │
-│   (MCP Client)  │     │  (14 Tools)  │     │  (FTS5+Vec) │
-└─────────────────┘     └──────────────┘     └─────────────┘
-                               │
-                               ▼
-                        ┌──────────────┐
-                        │   Docling    │
-                        │  (Extractor) │
-                        └──────────────┘
-```
-
-## 🔥 Why Developers Love It
-
-```python
-# Clean, intuitive API
-doc = await upload_document(
-    file_path="contract.pdf",
-    category="contract",
-    process_immediately=True
-)
-
-# Powerful search with snippets
-results = await search_documents(
-    query="payment terms NET 30",
-    limit=10
-)
-
-# Semantic similarity that just works
-similar = await vector_search(
-    query="documents about copper trading",
-    threshold=0.8
-)
-```
-
-## 📊 Performance
-
-- ⚡ **Processing Speed**: 1-3 seconds per document
-- 🔍 **Search Speed**: <100ms for 10,000 documents
-- 💾 **Storage**: ~1KB per document page
-- 🧠 **Accuracy**: 95%+ extraction accuracy
-- 🔄 **Concurrent**: Process multiple documents simultaneously
-
-## 🚦 Current Status
-
-| Component | Status | Version |
-|-----------|--------|---------|
-| Core MCP Server | ✅ Production Ready | 1.0.0 |
-| Document Processing | ✅ Stable | 1.0.0 |
-| Full-text Search | ✅ Optimized | 1.0.0 |
-| Vector Search | ✅ Operational | 1.0.0 |
-| Web Interface | ✅ Functional | 1.0.0 |
-| Claude Integration | ✅ Tested | 1.0.0 |
-
-## 🤝 Community
-
-- **Issues**: [GitHub Issues](https://github.com/kansofy/kansofy-trade/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/kansofy/kansofy-trade/discussions)
-- **Updates**: Follow [@kansofy](https://twitter.com/kansofy)
-
-## 📈 Roadmap
-
-### Coming Soon
-- 🔜 Multi-document relationship mapping
-- 🔜 Custom extraction templates
-- 🔜 Advanced analytics dashboard
-- 🔜 Cloud deployment options
-- 🔜 Plugin system for custom processors
-
-### Future Vision
-- 🎯 Multi-language support
-- 🎯 Real-time collaboration
-- 🎯 AI-powered document generation
-- 🎯 Blockchain verification
-
-## 🙏 Acknowledgments
-
-Built with amazing open-source projects:
-- [MCP](https://modelcontextprotocol.io) - Model Context Protocol
-- [Docling](https://github.com/DS4SD/docling) - Document processing
-- [SQLite FTS5](https://www.sqlite.org/fts5.html) - Full-text search
-- [Sentence Transformers](https://www.sbert.net) - Vector embeddings
-
-## 📄 License
-
-MIT License - see [LICENSE](LICENSE) for details.
+- [IBM Research](https://github.com/DS4SD) for Docling
+- [Anthropic](https://anthropic.com) for MCP protocol
+- The open-source community
 
 ---
 
-**Built with ❤️ for the Claude community**
-
-*Transform your documents. Empower your AI. Ship faster.*
+Built with ❤️ for the humans running global trade.  
+The engine for document workflows. The foundation for agentic AI in trade.

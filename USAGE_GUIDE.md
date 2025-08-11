@@ -1,34 +1,39 @@
-# Usage Guide 📖
+# Engine Operations Guide 📖
 
-Complete tutorials and workflows for using Kansofy-Trade MCP Server effectively.
+**How to simplify document workflows without any AI. The engine that runs deterministically, works offline, and never changes.**
 
 ## Table of Contents
 - [Getting Started](#getting-started)
-- [Basic Workflows](#basic-workflows)
+- [Engine Operations](#engine-operations)
   - [Upload and Process Documents](#upload-and-process-documents)
   - [Search Documents](#search-documents)
   - [Analyze Content](#analyze-content)
-- [Advanced Techniques](#advanced-techniques)
+- [Advanced Engine Features](#advanced-engine-features)
   - [Semantic Search](#semantic-search)
   - [Duplicate Detection](#duplicate-detection)
   - [Batch Processing](#batch-processing)
-- [Real-World Scenarios](#real-world-scenarios)
+- [Trade Workflow Solutions](#trade-workflow-solutions)
   - [Invoice Processing](#invoice-processing-workflow)
   - [Contract Analysis](#contract-analysis-workflow)
   - [Compliance Checking](#compliance-checking-workflow)
-- [Claude Desktop Integration](#claude-desktop-integration)
+- [AI Platform Integration](#ai-platform-integration)
 - [Web Interface Usage](#web-interface-usage)
 - [Best Practices](#best-practices)
 - [Performance Tips](#performance-tips)
 
 ## Getting Started
 
+### The Engine Difference
+
+**Traditional Approach**: 4+ hours daily processing 60-129 documents per shipment.
+**Engine Approach**: Minutes, not hours. Deterministic extraction. No AI variability.
+
 ### Your First Document
 
 Let's process your first document step by step:
 
 ```python
-# 1. Start the MCP server (automatic with Claude Desktop)
+# 1. Start the engine (automatic with any MCP client)
 # 2. Upload a document
 result = upload_document(
     file_path="/Users/john/Documents/invoice_2024.pdf",
@@ -74,9 +79,11 @@ graph LR
 | `failed` | Processing error occurred | Check logs, retry upload |
 | `archived` | Marked as archived | Excluded from searches |
 
-## Basic Workflows
+## Engine Operations
 
-### Upload and Process Documents
+### Deterministic Document Processing
+
+**Key Point**: Same document → Same output. Every time. No AI randomness.
 
 #### Single Document Upload
 
@@ -101,12 +108,12 @@ process_pending_documents()
 #### Handling Different File Types
 
 ```python
-# PDF with tables
+# PDF with tables - Docling extracts deterministically
 invoice = upload_document(
     file_path="invoice_with_tables.pdf",
     category="invoice"
 )
-# Tables are automatically extracted
+# Tables extracted by rule-based Docling (no AI/OCR)
 
 # CSV data file
 data = upload_document(
@@ -130,13 +137,13 @@ report = upload_document(
 # HTML is cleaned and text extracted
 ```
 
-### Search Documents
+### Search Without AI
 
-#### Basic Search
+#### SQL-Based Search (FTS5)
 
 ```python
-# Simple keyword search
-results = search_documents("copper shipment")
+# Database search - no AI inference
+results = search_documents("copper shipment")  # Pure SQL
 
 # With result limit
 results = search_documents("invoice", limit=20)
@@ -238,21 +245,21 @@ print(f"Frequent carriers: {analysis['patterns']['carriers']}")
 print(f"Typical delays: {analysis['patterns']['delays']}")
 ```
 
-## Advanced Techniques
+## Advanced Engine Features
 
-### Semantic Search
+### Pre-Computed Similarity Search
 
-Find documents by meaning, not just keywords:
+Find similar documents using pre-computed vectors (no AI inference):
 
 ```python
-# Find similar concepts
+# Pre-computed embeddings - no AI at search time
 similar = vector_search(
     query="legal documents about international trade disputes",
     limit=10,
     threshold=0.7
 )
 
-# Results include conceptually related documents
+# Uses pre-calculated vectors, pure math comparison
 for doc in similar['results']:
     print(f"{doc['filename']}: similarity {doc['similarity_score']:.2f}")
     # Might include: arbitration agreements, trade contracts, dispute resolutions
@@ -393,11 +400,11 @@ async def analyze_multiple(document_ids):
     }
 ```
 
-## Real-World Scenarios
+## Trade Workflow Solutions
 
-### Invoice Processing Workflow
+### Invoice Processing (100% Deterministic)
 
-Complete workflow for processing invoices:
+Process invoices without AI variability:
 
 ```python
 # Step 1: Upload invoice
@@ -406,17 +413,17 @@ invoice = upload_document(
     category="invoice"
 )
 
-# Step 2: Extract structured data
+# Step 2: Extract structured data (Docling, no AI)
 details = get_document_details(
     document_id=invoice['document_id'],
     include_content=True
-)
+)  # Deterministic extraction
 
-# Step 3: Get tables (line items)
+# Step 3: Get tables (Docling pattern matching)
 tables = get_document_tables(
     document_id=invoice['document_id'],
     format="json"
-)
+)  # No OCR, no AI - rule-based extraction
 
 # Step 4: Analyze for key information
 analysis = analyze_document_content(
@@ -448,9 +455,9 @@ print(f"Total: {invoice_data['total_amount']}")
 print(f"Items: {len(invoice_data['line_items'])}")
 ```
 
-### Contract Analysis Workflow
+### Contract Processing Engine
 
-Comprehensive contract review process:
+Deterministic contract extraction:
 
 ```python
 # Step 1: Upload contract
@@ -585,20 +592,20 @@ else:
     print(f"Missing clauses: {result['missing_clauses']}")
 ```
 
-## Claude Desktop Integration
+## AI Platform Integration
 
-### Basic Commands
+### Works With Any MCP Client
 
-When using Claude Desktop with Kansofy-Trade:
+**Claude Desktop**, **Microsoft Copilot**, or **any MCP-compatible platform**:
 
 ```
 User: "Upload the invoice on my desktop"
-Claude: I'll upload that invoice for you.
-[Uses upload_document tool]
+AI Assistant: I'll upload that invoice for you.
+[Engine extracts with Docling - no AI needed]
 
 User: "Find all contracts with arbitration clauses"
-Claude: I'll search for contracts containing arbitration clauses.
-[Uses search_documents with "contract AND arbitration"]
+AI Assistant: I'll search for contracts containing arbitration clauses.
+[Engine uses SQL search - deterministic results]
 
 User: "Are there any duplicates of this document?"
 Claude: Let me check for duplicates of this document.
@@ -609,18 +616,18 @@ Claude: I'll analyze the payment terms across these invoices.
 [Uses analyze_document_content with analysis_type="patterns"]
 ```
 
-### Advanced Claude Workflows
+### Advanced AI Integration Patterns
 
 ```
 User: "I need to review all January shipping documents for compliance"
 
-Claude: I'll help you review January shipping documents for compliance. Let me:
+AI Assistant: I'll help you review January shipping documents for compliance. Let me:
 1. Search for all January shipping documents
 2. Analyze them for required fields
 3. Check for compliance issues
 
-[Searches: "shipping AND 2024-01-*"]
-Found 12 shipping documents from January.
+[Engine SQL search: "shipping AND 2024-01-*"]
+Found 12 shipping documents from January (deterministic).
 
 [Analyzes each document for patterns and entities]
 Analysis complete. Here's the compliance summary:
@@ -639,16 +646,16 @@ Analysis complete. Here's the compliance summary:
 Would you like me to provide detailed analysis of the non-compliant documents?
 ```
 
-### Claude Conversation Examples
+### AI Assistant Integration Examples
 
 #### Example 1: Document Discovery
 ```
 User: "What documents do we have about copper trading with Chilean suppliers?"
 
-Claude: I'll search for documents related to copper trading with Chilean suppliers.
+AI Assistant: I'll search for documents related to copper trading with Chilean suppliers.
 
-[Uses search_documents: "copper AND Chile"]
-[Uses vector_search: "copper trading Chilean suppliers"]
+[Engine SQL search: "copper AND Chile"]
+[Engine similarity: pre-computed vectors, no AI]
 
 I found 7 relevant documents:
 1. **Purchase_Agreement_CU_2024.pdf** - Contract with Minera Chile SA
@@ -669,10 +676,10 @@ Key findings:
 ```
 User: "Compare these two contracts and highlight the differences"
 
-Claude: I'll compare these contracts and highlight the key differences.
+AI Assistant: I'll compare these contracts and highlight the key differences.
 
-[Uses get_document_details for both documents]
-[Uses analyze_document_content for both]
+[Engine extracts with Docling - deterministic]
+[Pattern matching with rules - no AI inference]
 
 Comparison Results:
 
@@ -869,13 +876,13 @@ reindex_fts5()  # Rebuilds search index
 
 ## Summary
 
-Kansofy-Trade provides powerful document intelligence capabilities through:
+The Kansofy-Trade engine provides deterministic document operations:
 
-1. **Simple Upload**: Drag-and-drop or programmatic upload
-2. **Intelligent Processing**: Automatic extraction of text, tables, and entities
-3. **Flexible Search**: Keyword and semantic search options
-4. **Rich Analysis**: Pattern detection and content analysis
-5. **Claude Integration**: Natural language interface for all operations
+1. **Docling Extraction**: IBM's rule-based parser (no AI)
+2. **Deterministic Processing**: Same input = same output always
+3. **SQL Search**: Database queries, not AI predictions
+4. **Pre-computed Vectors**: Math operations, not AI inference
+5. **Platform Agnostic**: Works with any MCP client (Claude, Copilot, etc.)
 
 Start with basic workflows and gradually explore advanced features as your needs grow.
 
