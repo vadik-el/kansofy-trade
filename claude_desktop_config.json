@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "kansofy-trade": {
+      "command": "python",
+      "args": ["mcp_server.py"],
+      "cwd": "/Users/vadik/clarity-sandbox/kansofy-trade",
+      "env": {
+        "DATABASE_PATH": "./kansofy_trade.db",
+        "UPLOAD_DIR": "./uploads"
+      }
+    }
+  }
+}

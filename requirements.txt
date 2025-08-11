@@ -1,0 +1,30 @@
+# Core FastAPI stack
+fastapi>=0.100.0
+uvicorn[standard]>=0.20.0
+python-multipart>=0.0.5
+jinja2>=3.1.0
+
+# Database and search
+sqlalchemy>=2.0.0
+aiosqlite>=0.19.0
+
+# Document processing
+docling>=2.0.0
+
+# Vector embeddings and similarity search
+sentence-transformers>=2.2.0
+numpy>=1.24.0
+
+# MCP Protocol
+mcp>=1.0.0
+
+# Configuration and utilities
+pydantic>=2.5.0
+pydantic-settings>=2.1.0
+python-dotenv>=1.0.0
+httpx>=0.25.0
+aiofiles>=23.0.0
+
+# Development (optional)
+pytest>=7.4.0
+pytest-asyncio>=0.21.0

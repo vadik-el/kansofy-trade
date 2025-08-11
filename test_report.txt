@@ -1,0 +1,40 @@
+
+================================================================================
+KANSOFY-TRADE COMPREHENSIVE TEST REPORT
+================================================================================
+
+Test Summary:
+-------------
+Total Tests:    12
+Passed:         6 ✅
+Failed:         4 ❌  
+Errors:         0 💥
+Skipped:        2 ⚠️
+Total Time:     6.67s
+
+Success Rate:   50.0%
+
+Detailed Results:
+-----------------
+✅ server_health                  PASS       0.04s  Server is healthy
+✅ dependencies                   PASS       3.55s  All dependencies available
+❌ document_upload                FAIL       0.03s  Upload failed: HTTP 409
+⚠️ document_processing            SKIP       0.00s  No uploaded documents to test
+❌ table_extraction               FAIL       0.01s  Upload failed: HTTP 409
+⚠️ embeddings_generation          SKIP       0.00s  No uploaded documents to test
+✅ vector_search                  PASS       0.65s  Found 5 search results
+❌ duplicate_detection            FAIL       0.02s  First upload failed: HTTP 409
+✅ api_endpoints                  PASS       0.05s  All 5 endpoints working correctly
+✅ database_integrity             PASS       0.01s  Database integrity OK: 3 tables, 7 indexes
+✅ performance_benchmarks         PASS       2.30s  All performance benchmarks passed
+❌ end_to_end_workflow            FAIL       0.01s  E2E workflow failed at upload: ['❌ Document upload failed']
+
+Performance Summary:
+--------------------
+api_response_time: 0.007s
+embedding_generation_time: 2.291s
+
+Final Assessment:
+-----------------
+⚠️  4 test(s) failed. Issues need to be addressed before release.
+================================================================================

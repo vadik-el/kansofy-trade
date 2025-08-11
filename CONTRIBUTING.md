@@ -1,0 +1,655 @@
+# Contributing to Kansofy-Trade 🤝
+
+Thank you for your interest in contributing to Kansofy-Trade! This guide will help you get started with contributing to the project.
+
+## Table of Contents
+- [Code of Conduct](#code-of-conduct)
+- [How to Contribute](#how-to-contribute)
+- [Development Setup](#development-setup)
+- [Code Standards](#code-standards)
+- [Testing Requirements](#testing-requirements)
+- [Pull Request Process](#pull-request-process)
+- [Architecture Guidelines](#architecture-guidelines)
+- [Adding New Features](#adding-new-features)
+- [Documentation](#documentation)
+- [Community](#community)
+
+## Code of Conduct
+
+### Our Pledge
+We are committed to providing a welcoming and inclusive environment for all contributors.
+
+### Expected Behavior
+- Be respectful and inclusive
+- Accept constructive criticism gracefully
+- Focus on what's best for the community
+- Show empathy towards other community members
+
+### Unacceptable Behavior
+- Harassment, discrimination, or offensive comments
+- Personal attacks or trolling
+- Publishing others' private information
+- Any conduct that could be considered inappropriate
+
+## How to Contribute
+
+### Types of Contributions
+
+We welcome various types of contributions:
+
+- 🐛 **Bug Reports**: Help us identify and fix issues
+- ✨ **Feature Requests**: Suggest new capabilities
+- 📚 **Documentation**: Improve guides and API docs
+- 🔧 **Code Contributions**: Submit fixes and features
+- 🧪 **Testing**: Add test coverage
+- 🎨 **UI/UX Improvements**: Enhance the web interface
+- 🌍 **Translations**: Help internationalize the project
+
+### First Time Contributors
+
+Look for issues tagged with:
+- `good first issue` - Simple tasks perfect for beginners
+- `help wanted` - Tasks where we need community help
+- `documentation` - Documentation improvements
+
+## Development Setup
+
+### 1. Fork and Clone
+
+```bash
+# Fork the repository on GitHub, then:
+git clone https://github.com/YOUR_USERNAME/kansofy-trade.git
+cd kansofy-trade
+
+# Add upstream remote
+git remote add upstream https://github.com/kansofy/kansofy-trade.git
+```
+
+### 2. Create Development Environment
+
+```bash
+# Create virtual environment
+python -m venv venv-dev
+source venv-dev/bin/activate  # On Windows: venv-dev\Scripts\activate
+
+# Install development dependencies
+pip install -r requirements.txt
+pip install -r requirements-dev.txt
+```
+
+### 3. Install Development Tools
+
+```bash
+# Install pre-commit hooks
+pip install pre-commit
+pre-commit install
+
+# Install testing tools
+pip install pytest pytest-asyncio pytest-cov
+pip install black isort flake8 mypy
+
+# Install documentation tools
+pip install mkdocs mkdocs-material
+```
+
+### 4. Set Up Development Database
+
+```bash
+# Initialize test database
+cp kansofy_trade.db kansofy_trade_dev.db
+
+# Set environment variable
+export DATABASE_PATH=./kansofy_trade_dev.db
+```
+
+### 5. Run Development Server
+
+```bash
+# Start with hot reload
+python -m uvicorn app.main:app --reload --port 8000
+
+# In another terminal, start MCP server
+python mcp_server.py --debug
+```
+
+## Code Standards
+
+### Python Style Guide
+
+We follow PEP 8 with these specifics:
+
+```python
+# File structure
+"""
+Module docstring explaining purpose and usage.
+"""
+
+import standard_library
+import third_party
+
+from app.local import modules
+
+
+# Constants
+MAX_FILE_SIZE = 50 * 1024 * 1024  # 50MB
+
+
+class DocumentProcessor:
+    """
+    Class docstring with description.
+    
+    Attributes:
+        attribute_name: Description of attribute
+    """
+    
+    def process_document(self, document: Document) -> ProcessedDocument:
+        """
+        Method docstring with description.
+        
+        Args:
+            document: The document to process
+            
+        Returns:
+            ProcessedDocument: The processed result
+            
+        Raises:
+            ProcessingError: If processing fails
+        """
+        # Implementation
+        pass
+```
+
+### Code Quality Tools
+
+Run these before committing:
+
+```bash
+# Format code
+black app/ tests/
+isort app/ tests/
+
+# Check style
+flake8 app/ tests/
+
+# Type checking
+mypy app/
+
+# All checks
+pre-commit run --all-files
+```
+
+### Naming Conventions
+
+```python
+# Variables and functions: snake_case
+document_id = 42
+def process_document():
+    pass
+
+# Classes: PascalCase
+class DocumentProcessor:
+    pass
+
+# Constants: UPPER_SNAKE_CASE
+MAX_UPLOAD_SIZE = 52428800
+
+# Private methods/attributes: leading underscore
+def _internal_method():
+    pass
+
+# File names: snake_case
+document_processor.py
+```
+
+### Error Handling
+
+```python
+# Always use specific exceptions
+class DocumentNotFoundError(Exception):
+    """Raised when a document cannot be found."""
+    pass
+
+# Provide context in errors
+def get_document(document_id: int) -> Document:
+    try:
+        document = db.query(Document).filter_by(id=document_id).first()
+        if not document:
+            raise DocumentNotFoundError(
+                f"Document with ID {document_id} not found"
+            )
+        return document
+    except SQLAlchemyError as e:
+        logger.error(f"Database error fetching document {document_id}: {e}")
+        raise DatabaseError(f"Failed to fetch document: {str(e)}")
+
+# Always log errors
+logger.error(f"Processing failed for document {doc_id}: {error}")
+```
+
+## Testing Requirements
+
+### Test Structure
+
+```
+tests/
+├── unit/           # Unit tests for individual components
+├── integration/    # Integration tests for component interactions
+├── e2e/           # End-to-end tests for complete workflows
+└── fixtures/      # Test data and fixtures
+```
+
+### Writing Tests
+
+```python
+# test_document_processor.py
+import pytest
+from app.services.document_processor import DocumentProcessor
+
+class TestDocumentProcessor:
+    """Test suite for DocumentProcessor."""
+    
+    @pytest.fixture
+    def processor(self):
+        """Create a processor instance for testing."""
+        return DocumentProcessor()
+    
+    @pytest.fixture
+    def sample_document(self, tmp_path):
+        """Create a sample document for testing."""
+        doc_path = tmp_path / "test.txt"
+        doc_path.write_text("Test content")
+        return str(doc_path)
+    
+    def test_process_text_document(self, processor, sample_document):
+        """Test processing a simple text document."""
+        # Arrange
+        expected_length = 12  # "Test content"
+        
+        # Act
+        result = processor.process_document(sample_document)
+        
+        # Assert
+        assert result.status == "completed"
+        assert len(result.content) == expected_length
+        assert result.confidence_score > 0.9
+    
+    @pytest.mark.asyncio
+    async def test_async_processing(self, processor, sample_document):
+        """Test asynchronous document processing."""
+        result = await processor.process_async(sample_document)
+        assert result.status == "completed"
+```
+
+### Running Tests
+
+```bash
+# Run all tests
+pytest
+
+# Run with coverage
+pytest --cov=app --cov-report=html
+
+# Run specific test file
+pytest tests/unit/test_document_processor.py
+
+# Run with verbose output
+pytest -v
+
+# Run only marked tests
+pytest -m "not slow"
+```
+
+### Test Coverage Requirements
+
+- New features must have >80% test coverage
+- Critical paths must have >95% coverage
+- All API endpoints must have integration tests
+- All MCP tools must have end-to-end tests
+
+## Pull Request Process
+
+### 1. Create Feature Branch
+
+```bash
+# Update main branch
+git checkout main
+git pull upstream main
+
+# Create feature branch
+git checkout -b feature/your-feature-name
+# Or for bugs:
+git checkout -b fix/issue-description
+```
+
+### 2. Make Changes
+
+```bash
+# Make your changes
+# Add tests
+# Update documentation
+
+# Commit with descriptive message
+git add .
+git commit -m "feat: add semantic search capability
+
+- Implement vector embeddings
+- Add similarity search endpoint
+- Update documentation
+- Add comprehensive tests
+
+Closes #123"
+```
+
+### Commit Message Format
+
+Follow [Conventional Commits](https://www.conventionalcommits.org/):
+
+```
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
+```
+
+Types:
+- `feat`: New feature
+- `fix`: Bug fix
+- `docs`: Documentation changes
+- `style`: Code style changes
+- `refactor`: Code refactoring
+- `test`: Test additions/changes
+- `chore`: Maintenance tasks
+
+Examples:
+```bash
+feat(search): add vector similarity search
+fix(upload): handle large PDF files correctly
+docs(api): update MCP tools documentation
+test(processor): add table extraction tests
+```
+
+### 3. Push and Create PR
+
+```bash
+# Push to your fork
+git push origin feature/your-feature-name
+
+# Create Pull Request on GitHub
+```
+
+### 4. PR Template
+
+```markdown
+## Description
+Brief description of changes
+
+## Type of Change
+- [ ] Bug fix
+- [ ] New feature
+- [ ] Breaking change
+- [ ] Documentation update
+
+## Changes Made
+- List specific changes
+- Include relevant details
+
+## Testing
+- [ ] Tests pass locally
+- [ ] Added new tests
+- [ ] Coverage maintained/improved
+
+## Checklist
+- [ ] Code follows style guidelines
+- [ ] Self-review completed
+- [ ] Documentation updated
+- [ ] No console errors/warnings
+- [ ] Commits are descriptive
+
+## Related Issues
+Closes #issue_number
+
+## Screenshots (if applicable)
+Add screenshots for UI changes
+```
+
+### 5. Review Process
+
+1. **Automated Checks**: CI runs tests, linting, coverage
+2. **Code Review**: Maintainer reviews code
+3. **Feedback**: Address review comments
+4. **Approval**: Get approval from maintainer
+5. **Merge**: Maintainer merges to main
+
+## Architecture Guidelines
+
+### Adding New MCP Tools
+
+1. **Define tool in `mcp_server.py`:**
+```python
+Tool(
+    name="your_tool_name",
+    description="Clear description of what the tool does",
+    inputSchema={
+        "type": "object",
+        "properties": {
+            "param1": {
+                "type": "string",
+                "description": "Parameter description"
+            }
+        },
+        "required": ["param1"]
+    }
+)
+```
+
+2. **Implement handler:**
+```python
+async def your_tool_handler(arguments: dict) -> list[TextContent]:
+    """Handle your_tool_name execution."""
+    param1 = arguments.get("param1")
+    
+    try:
+        # Tool logic here
+        result = perform_operation(param1)
+        
+        return [TextContent(
+            type="text",
+            text=f"Success: {result}"
+        )]
+    except Exception as e:
+        logger.error(f"Tool failed: {e}")
+        return [TextContent(
+            type="text",
+            text=f"Error: {str(e)}"
+        )]
+```
+
+3. **Add to router:**
+```python
+elif name == "your_tool_name":
+    return await your_tool_handler(arguments)
+```
+
+4. **Add tests:**
+```python
+def test_your_tool():
+    result = await your_tool_handler({"param1": "value"})
+    assert "Success" in result[0].text
+```
+
+5. **Update documentation** in `MCP_TOOLS_REFERENCE.md`
+
+### Adding New Document Processors
+
+1. **Create processor class:**
+```python
+# app/services/processors/your_processor.py
+from app.services.base_processor import BaseProcessor
+
+class YourFormatProcessor(BaseProcessor):
+    """Process YOUR_FORMAT documents."""
+    
+    supported_formats = ['.your_ext']
+    
+    def extract_content(self, file_path: str) -> dict:
+        """Extract content from YOUR_FORMAT file."""
+        # Implementation
+        return {
+            'text': extracted_text,
+            'metadata': metadata,
+            'tables': tables
+        }
+```
+
+2. **Register processor:**
+```python
+# In document_processor.py
+PROCESSORS = {
+    '.your_ext': YourFormatProcessor(),
+    # ...
+}
+```
+
+3. **Add tests and documentation**
+
+## Adding New Features
+
+### Feature Development Process
+
+1. **Discuss First**: Open an issue to discuss the feature
+2. **Design Document**: For major features, create a design doc
+3. **Prototype**: Build a minimal working version
+4. **Tests**: Write comprehensive tests
+5. **Documentation**: Update all relevant docs
+6. **Performance**: Ensure no regression
+7. **Security**: Consider security implications
+
+### Feature Checklist
+
+- [ ] Follows existing architecture patterns
+- [ ] Includes unit tests (>80% coverage)
+- [ ] Includes integration tests
+- [ ] Updates API documentation
+- [ ] Updates user documentation
+- [ ] Considers backward compatibility
+- [ ] Handles errors gracefully
+- [ ] Logs appropriately
+- [ ] Performance impact assessed
+- [ ] Security implications considered
+
+## Documentation
+
+### Documentation Requirements
+
+All contributions must include:
+
+1. **Code Documentation**:
+   - Docstrings for all public functions/classes
+   - Inline comments for complex logic
+   - Type hints for all parameters
+
+2. **User Documentation**:
+   - Update README if needed
+   - Update relevant guides
+   - Add examples
+
+3. **API Documentation**:
+   - Update API reference
+   - Include request/response examples
+   - Document error cases
+
+### Documentation Style
+
+```python
+def process_document(
+    file_path: str,
+    category: str = "other",
+    process_immediately: bool = True
+) -> Dict[str, Any]:
+    """
+    Process a document for intelligence extraction.
+    
+    This function handles the complete document processing pipeline,
+    including text extraction, entity recognition, and indexing.
+    
+    Args:
+        file_path: Path to the document file
+        category: Document category (invoice, contract, etc.)
+        process_immediately: Whether to process immediately or queue
+    
+    Returns:
+        Dictionary containing:
+            - document_id: Unique identifier
+            - status: Processing status
+            - extracted_data: Extracted information
+    
+    Raises:
+        FileNotFoundError: If file doesn't exist
+        ProcessingError: If processing fails
+        ValueError: If category is invalid
+    
+    Example:
+        >>> result = process_document("/path/to/invoice.pdf", "invoice")
+        >>> print(f"Document ID: {result['document_id']}")
+        42
+    """
+    # Implementation
+    pass
+```
+
+## Community
+
+### Getting Help
+
+- **Discord**: [Join our Discord](https://discord.gg/kansofy)
+- **Discussions**: [GitHub Discussions](https://github.com/kansofy/kansofy-trade/discussions)
+- **Issues**: [GitHub Issues](https://github.com/kansofy/kansofy-trade/issues)
+
+### Recognition
+
+Contributors are recognized in:
+- [CONTRIBUTORS.md](CONTRIBUTORS.md) file
+- Release notes
+- Project README
+
+### Becoming a Maintainer
+
+Active contributors who demonstrate:
+- Consistent quality contributions
+- Good understanding of the codebase
+- Helpful community participation
+- Alignment with project goals
+
+May be invited to become maintainers.
+
+## Release Process
+
+### Version Numbering
+
+We use [Semantic Versioning](https://semver.org/):
+- MAJOR: Breaking changes
+- MINOR: New features (backward compatible)
+- PATCH: Bug fixes
+
+### Release Checklist
+
+- [ ] All tests passing
+- [ ] Documentation updated
+- [ ] CHANGELOG.md updated
+- [ ] Version bumped
+- [ ] Release notes drafted
+- [ ] Tagged in git
+- [ ] Published to PyPI
+
+---
+
+## Thank You! 🙏
+
+Your contributions make Kansofy-Trade better for everyone. We appreciate your time and effort!
+
+**Happy Contributing!** 🚀
+
+---
+
+*Questions? Reach out in [Discussions](https://github.com/kansofy/kansofy-trade/discussions) or [Discord](https://discord.gg/kansofy)*

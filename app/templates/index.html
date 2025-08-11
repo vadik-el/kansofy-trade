@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }} - Document Intelligence Platform</title>
+    <!-- Tailwind CSS CDN - For development only. Use CLI build for production -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .upload-area {
+            border: 2px dashed #e2e8f0;
+            transition: all 0.3s ease;
+        }
+        .upload-area.dragover {
+            border-color: #667eea;
+            background-color: #f8faff;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div x-data="documentApp()" class="min-h-screen">
+        <!-- Header -->
+        <header class="gradient-bg text-white shadow-lg">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-3xl font-bold">{{ title }}</h1>
+                        <p class="text-blue-100 mt-1">{{ description }}</p>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="text-right">
+                            <div class="text-sm text-blue-100">MCP Server</div>
+                            <div class="text-lg font-semibold" :class="mcpStatus ? 'text-green-300' : 'text-red-300'">
+                                <i class="fas fa-circle text-xs mr-1"></i>
+                                <span x-text="mcpStatus ? 'Connected' : 'Offline'"></span>
+                            </div>
+                        </div>
+                        <button 
+                            @click="checkSystemHealth()"
+                            class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg transition-colors"
+                        >
+                            <i class="fas fa-heartbeat mr-2"></i>Health Check
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white rounded-lg shadow p-6">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                            <i class="fas fa-file-alt text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-500">Total Documents</p>
+                            <p class="text-2xl font-semibold text-gray-900" x-text="stats.total_documents || 0"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow p-6">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-green-100 text-green-600">
+                            <i class="fas fa-check-circle text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-500">Processed</p>
+                            <p class="text-2xl font-semibold text-gray-900" x-text="stats.by_status?.completed || 0"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow p-6">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
+                            <i class="fas fa-clock text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-500">Processing</p>
+                            <p class="text-2xl font-semibold text-gray-900" x-text="stats.by_status?.processing || 0"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow p-6">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-purple-100 text-purple-600">
+                            <i class="fas fa-database text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-500">Total Size</p>
+                            <p class="text-2xl font-semibold text-gray-900" x-text="formatFileSize(stats.total_size || 0)"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upload Section -->
+            <div class="bg-white rounded-lg shadow mb-8">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h2 class="text-xl font-semibold text-gray-900">
+                        <i class="fas fa-upload mr-2 text-blue-600"></i>Upload Documents
+                    </h2>
+                    <p class="text-gray-600 mt-1">Drag and drop files or click to select. Supports PDF, DOCX, TXT, XLSX, CSV up to 50MB.</p>
+                </div>
+                
+                <div class="p-6">
+                    <div 
+                        class="upload-area rounded-lg p-8 text-center cursor-pointer"
+                        @click="$refs.fileInput.click()"
+                        @dragover.prevent="handleDragOver($event)"
+                        @dragleave.prevent="handleDragLeave($event)"
+                        @drop.prevent="handleDrop($event)"
+                    >
+                        <div x-show="!uploading">
+                            <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4"></i>
+                            <h3 class="text-lg font-medium text-gray-900 mb-2">Drop files here or click to browse</h3>
+                            <p class="text-gray-500">PDF, DOCX, TXT, XLSX, CSV files up to 50MB</p>
+                        </div>
+                        
+                        <div x-show="uploading" class="flex items-center justify-center">
+                            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-3"></div>
+                            <span class="text-gray-600">Uploading...</span>
+                        </div>
+                        
+                        <input 
+                            type="file" 
+                            ref="fileInput" 
+                            class="hidden" 
+                            multiple 
+                            accept=".pdf,.docx,.txt,.xlsx,.csv"
+                            @change="handleFileSelect($event)"
+                        >
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search Section -->
+            <div class="bg-white rounded-lg shadow mb-8">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h2 class="text-xl font-semibold text-gray-900">
+                        <i class="fas fa-search mr-2 text-blue-600"></i>Search Documents
+                    </h2>
+                    <p class="text-gray-600 mt-1">Use full-text search with boolean operators, phrases, and wildcards.</p>
+                </div>
+                
+                <div class="p-6">
+                    <div class="flex space-x-4">
+                        <div class="flex-1">
+                            <input 
+                                type="text" 
+                                x-model="searchQuery"
+                                @keyup.enter="searchDocuments()"
+                                placeholder="Search documents... (e.g., 'copper AND invoice', 'purchase order')"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            >
+                        </div>
+                        <button 
+                            @click="searchDocuments()"
+                            :disabled="!searchQuery.trim() || searching"
+                            class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white px-6 py-2 rounded-lg transition-colors"
+                        >
+                            <i class="fas fa-search mr-2"></i>
+                            <span x-text="searching ? 'Searching...' : 'Search'"></span>
+                        </button>
+                    </div>
+                    
+                    <!-- Search Results -->
+                    <div x-show="searchResults.length > 0" class="mt-6">
+                        <h3 class="text-lg font-medium text-gray-900 mb-4">
+                            Search Results (<span x-text="searchResults.length"></span>)
+                        </h3>
+                        <div class="space-y-4">
+                            <template x-for="result in searchResults" :key="result.id">
+                                <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
+                                    <div class="flex items-start justify-between">
+                                        <div class="flex-1">
+                                            <h4 class="font-medium text-gray-900" x-text="result.filename"></h4>
+                                            <p class="text-sm text-gray-500 mt-1">
+                                                Size: <span x-text="formatFileSize(result.file_size)"></span> | 
+                                                Uploaded: <span x-text="formatDate(result.uploaded_at)"></span>
+                                            </p>
+                                            <div x-show="result.snippet" class="mt-2">
+                                                <p class="text-sm text-gray-600" x-html="result.snippet"></p>
+                                            </div>
+                                        </div>
+                                        <div class="ml-4 flex-shrink-0">
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                Relevance: <span x-text="(result.relevance_score || 0).toFixed(3)"></span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Documents -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-900">
+                            <i class="fas fa-history mr-2 text-blue-600"></i>Recent Documents
+                        </h2>
+                        <p class="text-gray-600 mt-1">Latest uploaded and processed documents.</p>
+                    </div>
+                    <button 
+                        @click="loadDocuments()"
+                        class="text-blue-600 hover:text-blue-800 font-medium"
+                    >
+                        <i class="fas fa-sync-alt mr-1"></i>Refresh
+                    </button>
+                </div>
+                
+                <div class="p-6">
+                    <div x-show="documents.length === 0" class="text-center py-8">
+                        <i class="fas fa-file-alt text-4xl text-gray-300 mb-4"></i>
+                        <p class="text-gray-500">No documents uploaded yet. Upload your first document above!</p>
+                    </div>
+                    
+                    <div x-show="documents.length > 0" class="space-y-4">
+                        <template x-for="doc in documents" :key="doc.id">
+                            <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex-1">
+                                        <h4 class="font-medium text-gray-900" x-text="doc.original_filename"></h4>
+                                        <p class="text-sm text-gray-500 mt-1">
+                                            <span x-text="formatFileSize(doc.file_size)"></span> | 
+                                            <span x-text="formatDate(doc.uploaded_at)"></span>
+                                            <span x-show="doc.confidence_score > 0">
+                                                | Confidence: <span x-text="(doc.confidence_score * 100).toFixed(1)"></span>%
+                                            </span>
+                                        </p>
+                                    </div>
+                                    <div class="ml-4 flex items-center space-x-2">
+                                        <button 
+                                            @click="showDocumentDetails(doc)"
+                                            class="text-blue-600 hover:text-blue-800 text-sm font-medium px-3 py-1 rounded border border-blue-200 hover:bg-blue-50 transition-colors"
+                                        >
+                                            <i class="fas fa-eye mr-1"></i>View
+                                        </button>
+                                        <span 
+                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                                            :class="{
+                                                'bg-green-100 text-green-800': doc.status === 'completed',
+                                                'bg-yellow-100 text-yellow-800': doc.status === 'processing',
+                                                'bg-red-100 text-red-800': doc.status === 'failed',
+                                                'bg-gray-100 text-gray-800': doc.status === 'uploaded'
+                                            }"
+                                            x-text="doc.status"
+                                        ></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Document Detail Modal -->
+        <div x-show="showModal" x-transition class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+                <div class="flex items-center justify-between p-6 border-b border-gray-200">
+                    <h2 class="text-xl font-semibold text-gray-900">Document Details</h2>
+                    <button @click="closeModal()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <div class="p-6 overflow-y-auto max-h-[calc(90vh-120px)]" x-show="selectedDocument">
+                    <!-- Document Info -->
+                    <div class="grid grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-900 mb-4">File Information</h3>
+                            <dl class="space-y-2 text-sm">
+                                <div class="flex">
+                                    <dt class="font-medium text-gray-500 w-24">Filename:</dt>
+                                    <dd class="text-gray-900" x-text="selectedDocument?.original_filename"></dd>
+                                </div>
+                                <div class="flex">
+                                    <dt class="font-medium text-gray-500 w-24">Size:</dt>
+                                    <dd class="text-gray-900" x-text="formatFileSize(selectedDocument?.file_size)"></dd>
+                                </div>
+                                <div class="flex">
+                                    <dt class="font-medium text-gray-500 w-24">Type:</dt>
+                                    <dd class="text-gray-900" x-text="selectedDocument?.content_type"></dd>
+                                </div>
+                                <div class="flex">
+                                    <dt class="font-medium text-gray-500 w-24">Status:</dt>
+                                    <dd>
+                                        <span 
+                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                                            :class="{
+                                                'bg-green-100 text-green-800': selectedDocument?.status === 'completed',
+                                                'bg-yellow-100 text-yellow-800': selectedDocument?.status === 'processing',
+                                                'bg-red-100 text-red-800': selectedDocument?.status === 'failed',
+                                                'bg-gray-100 text-gray-800': selectedDocument?.status === 'uploaded'
+                                            }"
+                                            x-text="selectedDocument?.status"
+                                        ></span>
+                                    </dd>
+                                </div>
+                                <div class="flex">
+                                    <dt class="font-medium text-gray-500 w-24">Uploaded:</dt>
+                                    <dd class="text-gray-900" x-text="formatDate(selectedDocument?.uploaded_at)"></dd>
+                                </div>
+                                <div x-show="selectedDocument?.processed_at" class="flex">
+                                    <dt class="font-medium text-gray-500 w-24">Processed:</dt>
+                                    <dd class="text-gray-900" x-text="formatDate(selectedDocument?.processed_at)"></dd>
+                                </div>
+                            </dl>
+                        </div>
+                        
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-900 mb-4">Processing Results</h3>
+                            <dl class="space-y-2 text-sm">
+                                <div class="flex">
+                                    <dt class="font-medium text-gray-500 w-32">Content Length:</dt>
+                                    <dd class="text-gray-900" x-text="selectedDocument?.content_length || 0"></dd>
+                                </div>
+                                <div class="flex">
+                                    <dt class="font-medium text-gray-500 w-32">Has Content:</dt>
+                                    <dd>
+                                        <span x-text="selectedDocument?.has_content ? '✅ Yes' : '❌ No'" 
+                                              :class="selectedDocument?.has_content ? 'text-green-600' : 'text-red-600'"></span>
+                                    </dd>
+                                </div>
+                                <div x-show="selectedDocument?.confidence_score > 0" class="flex">
+                                    <dt class="font-medium text-gray-500 w-32">Confidence:</dt>
+                                    <dd class="text-gray-900" x-text="(selectedDocument?.confidence_score * 100).toFixed(1) + '%'"></dd>
+                                </div>
+                            </dl>
+                        </div>
+                    </div>
+
+                    <!-- Processing Actions -->
+                    <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h4 class="font-medium text-gray-900">Document Processing</h4>
+                                <p class="text-sm text-gray-600 mt-1">Extract text and analyze document content</p>
+                            </div>
+                            <button 
+                                @click="processDocument(selectedDocument.id)"
+                                :disabled="processing"
+                                class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white px-4 py-2 rounded-lg transition-colors"
+                            >
+                                <i class="fas fa-cog mr-2" :class="{'animate-spin': processing}"></i>
+                                <span x-text="processing ? 'Processing...' : 'Process Now'"></span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Loading State -->
+                    <div x-show="selectedDocument?.has_content && !documentContent" class="text-center py-8">
+                        <i class="fas fa-spinner fa-spin text-3xl text-blue-500 mb-4"></i>
+                        <p class="text-gray-500">Loading document content...</p>
+                    </div>
+                    
+                    <!-- Content Display -->
+                    <div x-show="documentContent" class="space-y-6">
+                        <!-- Extracted Text -->
+                        <div x-show="documentContent?.content">
+                            <h3 class="text-lg font-medium text-gray-900 mb-3">Extracted Text</h3>
+                            <div class="bg-gray-50 rounded-lg p-4 max-h-96 overflow-y-auto border border-gray-200">
+                                <pre class="whitespace-pre-wrap text-sm text-gray-700 font-mono" x-text="documentContent?.content || 'No content available'"></pre>
+                            </div>
+                        </div>
+                        
+                        <!-- Extracted Tables -->
+                        <div x-show="documentContent?.tables && documentContent.tables.length > 0">
+                            <h3 class="text-lg font-medium text-gray-900 mb-3">
+                                <i class="fas fa-table mr-2 text-blue-600"></i>Extracted Tables (<span x-text="documentContent.tables.length"></span>)
+                            </h3>
+                            <div class="space-y-4">
+                                <template x-for="(table, index) in documentContent.tables" :key="index">
+                                    <div class="border border-gray-200 rounded-lg overflow-hidden">
+                                        <div class="bg-gray-50 px-4 py-2 border-b border-gray-200">
+                                            <h4 class="font-medium text-gray-900">
+                                                Table <span x-text="index + 1"></span>
+                                                <span x-show="table.caption" class="text-sm text-gray-600 ml-2">
+                                                    - <span x-text="table.caption"></span>
+                                                </span>
+                                            </h4>
+                                        </div>
+                                        <div class="p-4">
+                                            <!-- Display table based on available data -->
+                                            <div x-show="table.rows && table.rows.length > 0" class="overflow-x-auto">
+                                                <table class="min-w-full divide-y divide-gray-200">
+                                                    <!-- Table headers if available -->
+                                                    <thead x-show="table.headers && table.headers.length > 0" class="bg-gray-50">
+                                                        <tr>
+                                                            <template x-for="header in table.headers" :key="header">
+                                                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200 last:border-r-0">
+                                                                    <span x-text="header"></span>
+                                                                </th>
+                                                            </template>
+                                                        </tr>
+                                                    </thead>
+                                                    <!-- Table body -->
+                                                    <tbody class="bg-white divide-y divide-gray-200">
+                                                        <template x-for="(row, rowIndex) in table.rows.slice(0, 10)" :key="rowIndex">
+                                                            <tr class="hover:bg-gray-50">
+                                                                <template x-for="(cell, cellIndex) in (Array.isArray(row) ? row : Object.values(row))" :key="cellIndex">
+                                                                    <td class="px-3 py-2 text-sm text-gray-900 border-r border-gray-200 last:border-r-0">
+                                                                        <span x-text="cell || '-'"></span>
+                                                                    </td>
+                                                                </template>
+                                                            </tr>
+                                                        </template>
+                                                    </tbody>
+                                                </table>
+                                                <div x-show="table.rows.length > 10" class="text-sm text-gray-500 mt-2">
+                                                    Showing first 10 rows of <span x-text="table.rows.length"></span> total
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Fallback display if no structured rows -->
+                                            <div x-show="!table.rows || table.rows.length === 0">
+                                                <div x-show="table.content" class="bg-gray-50 p-3 rounded text-sm text-gray-700">
+                                                    <pre x-text="table.content"></pre>
+                                                </div>
+                                                <div x-show="!table.content" class="text-gray-500 text-sm">
+                                                    No table data available
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Table metadata -->
+                                            <div x-show="table.type" class="mt-2 text-xs text-gray-500">
+                                                Type: <span x-text="table.type"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                        
+                    </div>
+
+                    <!-- No Content Message -->
+                    <div x-show="!documentContent?.content && !processing && selectedDocument?.status === 'uploaded'" class="text-center py-8">
+                        <i class="fas fa-file-alt text-4xl text-gray-300 mb-4"></i>
+                        <p class="text-gray-500">This document hasn't been processed yet. Click "Process Now" to extract content.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function documentApp() {
+            return {
+                // State
+                stats: {},
+                documents: [],
+                searchQuery: '',
+                searchResults: [],
+                uploading: false,
+                searching: false,
+                processing: false,
+                mcpStatus: false,
+                showModal: false,
+                selectedDocument: null,
+                documentContent: null,
+                
+                // Initialize
+                async init() {
+                    await this.loadStats();
+                    await this.loadDocuments();
+                    await this.checkSystemHealth();
+                },
+                
+                // Load statistics
+                async loadStats() {
+                    try {
+                        const response = await fetch('/api/v1/documents/stats');
+                        if (response.ok) {
+                            this.stats = await response.json();
+                        }
+                    } catch (error) {
+                        console.error('Failed to load stats:', error);
+                    }
+                },
+                
+                // Load recent documents
+                async loadDocuments() {
+                    try {
+                        const response = await fetch('/api/v1/documents?limit=10');
+                        if (response.ok) {
+                            this.documents = await response.json();
+                        }
+                    } catch (error) {
+                        console.error('Failed to load documents:', error);
+                    }
+                },
+                
+                // Search documents
+                async searchDocuments() {
+                    if (!this.searchQuery.trim()) return;
+                    
+                    this.searching = true;
+                    try {
+                        const response = await fetch(`/api/v1/search?q=${encodeURIComponent(this.searchQuery)}&limit=20`);
+                        if (response.ok) {
+                            this.searchResults = await response.json();
+                        }
+                    } catch (error) {
+                        console.error('Search failed:', error);
+                        alert('Search failed. Please try again.');
+                    }
+                    this.searching = false;
+                },
+                
+                // File upload handling
+                async handleFileSelect(event) {
+                    const files = event.target.files;
+                    if (files.length > 0) {
+                        await this.uploadFiles(Array.from(files));
+                    }
+                },
+                
+                // Drag and drop handling
+                handleDragOver(event) {
+                    event.currentTarget.classList.add('dragover');
+                },
+                
+                handleDragLeave(event) {
+                    event.currentTarget.classList.remove('dragover');
+                },
+                
+                async handleDrop(event) {
+                    event.currentTarget.classList.remove('dragover');
+                    const files = Array.from(event.dataTransfer.files);
+                    if (files.length > 0) {
+                        await this.uploadFiles(files);
+                    }
+                },
+                
+                // Upload files
+                async uploadFiles(files) {
+                    this.uploading = true;
+                    
+                    for (const file of files) {
+                        try {
+                            const formData = new FormData();
+                            formData.append('file', file);
+                            
+                            const response = await fetch('/api/v1/documents', {
+                                method: 'POST',
+                                body: formData
+                            });
+                            
+                            if (response.ok) {
+                                console.log(`Uploaded: ${file.name}`);
+                            } else {
+                                const error = await response.json();
+                                alert(`Upload failed for ${file.name}: ${error.detail}`);
+                            }
+                        } catch (error) {
+                            console.error(`Upload error for ${file.name}:`, error);
+                            alert(`Upload failed for ${file.name}`);
+                        }
+                    }
+                    
+                    this.uploading = false;
+                    
+                    // Refresh data
+                    await this.loadStats();
+                    await this.loadDocuments();
+                },
+                
+                // System health check
+                async checkSystemHealth() {
+                    try {
+                        const response = await fetch('/api/v1/health/detailed');
+                        if (response.ok) {
+                            const health = await response.json();
+                            this.mcpStatus = health.status === 'healthy';
+                        }
+                    } catch (error) {
+                        console.error('Health check failed:', error);
+                        this.mcpStatus = false;
+                    }
+                },
+                
+                // Utility functions
+                formatFileSize(bytes) {
+                    if (!bytes) return '0 B';
+                    const sizes = ['B', 'KB', 'MB', 'GB'];
+                    const i = Math.floor(Math.log(bytes) / Math.log(1024));
+                    return `${(bytes / Math.pow(1024, i)).toFixed(1)} ${sizes[i]}`;
+                },
+                
+                formatDate(dateString) {
+                    if (!dateString) return 'Unknown';
+                    return new Date(dateString).toLocaleDateString();
+                },
+
+                // Document detail modal functions
+                async showDocumentDetails(document) {
+                    this.selectedDocument = document;
+                    this.documentContent = null;
+                    this.showModal = true;
+                    
+                    // If document has content, load it
+                    if (document.has_content) {
+                        await this.loadDocumentContent(document.id);
+                    }
+                },
+
+                closeModal() {
+                    this.showModal = false;
+                    this.selectedDocument = null;
+                    this.documentContent = null;
+                },
+
+                async loadDocumentContent(documentId) {
+                    try {
+                        const response = await fetch(`/api/v1/documents/${documentId}`);
+                        if (response.ok) {
+                            const doc = await response.json();
+                            console.log('Document loaded:', {
+                                id: doc.id,
+                                has_content: doc.has_content,
+                                content_length: doc.content_length,
+                                content_preview: doc.content ? doc.content.substring(0, 100) : 'No content'
+                            });
+                            // Parse entities if it's a string
+                            if (doc.entities && typeof doc.entities === 'string') {
+                                try {
+                                    doc.entities = JSON.parse(doc.entities);
+                                } catch (e) {
+                                    console.error('Failed to parse entities:', e);
+                                }
+                            }
+                            // Parse tables if it's a string
+                            if (doc.tables && typeof doc.tables === 'string') {
+                                try {
+                                    doc.tables = JSON.parse(doc.tables);
+                                } catch (e) {
+                                    console.error('Failed to parse tables:', e);
+                                }
+                            }
+                            this.documentContent = doc;
+                        }
+                    } catch (error) {
+                        console.error('Failed to load document content:', error);
+                    }
+                },
+
+                async processDocument(documentId) {
+                    this.processing = true;
+                    try {
+                        const response = await fetch(`/api/v1/documents/${documentId}/process`, {
+                            method: 'POST'
+                        });
+                        
+                        if (response.ok) {
+                            // Reload document data
+                            await this.loadDocumentContent(documentId);
+                            const updatedDoc = await fetch(`/api/v1/documents/${documentId}`);
+                            if (updatedDoc.ok) {
+                                this.selectedDocument = await updatedDoc.json();
+                            }
+                            // Refresh documents list
+                            await this.loadDocuments();
+                        } else {
+                            alert('Processing failed. Please try again.');
+                        }
+                    } catch (error) {
+                        console.error('Processing failed:', error);
+                        alert('Processing failed. Please try again.');
+                    }
+                    this.processing = false;
+                }
+            }
+        }
+    </script>
+</body>
+</html>
