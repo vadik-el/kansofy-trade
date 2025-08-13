@@ -1,9 +1,17 @@
 #!/usr/bin/env python3
 """
-Download required AI models for TradeMCP.
+Download the local AI model for TradeMCP.
 
-This script downloads the sentence-transformers model that is used
-for text embeddings and semantic analysis in the trading system.
+This script downloads a small, efficient AI model that runs 100% locally
+on your machine. No cloud services, no API keys, complete privacy.
+
+The model enables:
+- Semantic search (find by meaning, not just keywords)
+- Document similarity matching
+- Smart categorization
+- Context understanding
+
+All processing happens locally - your documents never leave your machine.
 """
 
 import os
@@ -22,8 +30,16 @@ def download_models():
         print(f"✅ Model '{model_name}' already downloaded.")
         return True
     
-    print(f"📥 Downloading model: {model_name}")
-    print("This is a one-time download of ~87MB...")
+    print(f"📥 Downloading LOCAL AI model: {model_name}")
+    print("📦 Size: ~87MB (one-time download)")
+    print("🔒 Privacy: Runs 100% locally on your machine")
+    print("💻 No cloud services or API keys required")
+    print("")
+    print("This model enables intelligent document understanding:")
+    print("  • Semantic search by meaning")
+    print("  • Document similarity matching")
+    print("  • Smart categorization")
+    print("")
     
     try:
         # Import sentence_transformers
@@ -81,8 +97,12 @@ def check_dependencies():
 def main():
     """Main function."""
     print("=" * 50)
-    print("TradeMCP Model Downloader")
+    print("TradeMCP Local AI Model Setup")
     print("=" * 50)
+    print()
+    print("This tool downloads a small AI model that runs")
+    print("100% locally for complete privacy and security.")
+    print("No cloud services, no API keys, no data transmission.")
     print()
     
     # Check dependencies first

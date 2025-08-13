@@ -57,15 +57,40 @@ The **brain** (workflow intelligence, trade expertise, compliance logic) can com
    pip install -r requirements.txt
    ```
 
-2. **Download AI models** (first time only):
+2. **Download the local AI model** (first time only):
    ```bash
    python download_models.py
    ```
-   This downloads the sentence-transformer model (~87MB) used for semantic analysis.
+   This downloads a small, efficient AI model that runs 100% locally on your machine.
 
-### Note on Model Files
+### 🧠 About the Local AI Model
 
-The AI models are not included in the repository to keep it lightweight. They will be downloaded to `model_cache/` on first run and are ignored by git.
+**What is it?**
+- **Model**: `sentence-transformers/all-MiniLM-L6-v2` 
+- **Size**: ~87MB (small and efficient)
+- **Type**: Local embedding model - runs entirely on your CPU/GPU
+- **Privacy**: 100% local - no data sent to external servers
+- **No API keys**: No OpenAI, Anthropic, or cloud service needed
+
+**What does it do?**
+This local model provides intelligent document understanding:
+- **Semantic Search**: Find documents by meaning, not just keywords
+- **Document Similarity**: Identify related trade documents automatically
+- **Smart Categorization**: Automatically group similar documents
+- **Context Understanding**: Understand relationships between different parts of documents
+
+**Why a local model?**
+- ✅ **Complete Privacy**: Your sensitive trade documents never leave your machine
+- ✅ **No API Costs**: No usage fees or rate limits
+- ✅ **Offline Operation**: Works without internet connection
+- ✅ **Fast Processing**: No network latency, instant results
+- ✅ **Predictable Performance**: Same results every time, no service degradation
+
+### Note on Model Storage
+
+The model files are stored in `model_cache/` (excluded from git to keep the repository lightweight). They persist between sessions - you only download once.
+
+📚 **For technical details about the model, see [MODEL_INFO.md](MODEL_INFO.md)**
 
 ### Docling by IBM Research (Default Parser)
 This project leverages [Docling](https://github.com/DS4SD/docling), IBM's advanced document conversion technology:
