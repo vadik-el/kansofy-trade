@@ -110,3 +110,11 @@ dmypy.json
 local/
 temp/
 tmp/
+
+# Model cache (large files)
+model_cache/
+*.pt
+*.bin
+*.pkl
+*.h5
+*.onnx

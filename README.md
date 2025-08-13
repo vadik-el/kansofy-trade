@@ -48,6 +48,25 @@ The **brain** (workflow intelligence, trade expertise, compliance logic) can com
 
 **All components are modular and replaceable.** Docling can be replaced with domain-specific tools or services tailored to your exact document processing needs.
 
+## 📦 Installation & Setup
+
+### Prerequisites
+
+1. **Install dependencies**:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+2. **Download AI models** (first time only):
+   ```bash
+   python download_models.py
+   ```
+   This downloads the sentence-transformer model (~87MB) used for semantic analysis.
+
+### Note on Model Files
+
+The AI models are not included in the repository to keep it lightweight. They will be downloaded to `model_cache/` on first run and are ignored by git.
+
 ### Docling by IBM Research (Default Parser)
 This project leverages [Docling](https://github.com/DS4SD/docling), IBM's advanced document conversion technology:
 - **Rule-based extraction** - No AI/ML required
